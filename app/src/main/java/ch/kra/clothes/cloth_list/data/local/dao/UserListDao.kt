@@ -9,6 +9,9 @@ interface UserListDao {
     @Query("SELECT * FROM tbl_user_list")
     fun getUsersList(): Flow<List<UserListEntity>>
 
+    @Query("SELECT * FROM tbl_user_list WHERE id = :id")
+    fun getUserListById(id: Int): Flow<UserListEntity>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUserList(userListEntity: UserListEntity)
 

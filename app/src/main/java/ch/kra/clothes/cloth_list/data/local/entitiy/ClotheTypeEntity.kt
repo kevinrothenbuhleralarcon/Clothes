@@ -4,7 +4,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "tbl_clothe_type")
-data class ClotheType(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+data class ClotheTypeEntity(
+    @PrimaryKey(autoGenerate = true) val clothTypeId: Int = 0,
     val type: String
 )

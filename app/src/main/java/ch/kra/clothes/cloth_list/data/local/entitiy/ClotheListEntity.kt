@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "tbl_clothe_list")
 data class ClotheListEntity(
-    @PrimaryKey(autoGenerate = true) val id: Int = 0,
+    @PrimaryKey(autoGenerate = true) val clothListId: Int = 0,
     val clothe: String,
     val quantity: Int,
     @ColumnInfo(name = "type_id") val typeId: Int,

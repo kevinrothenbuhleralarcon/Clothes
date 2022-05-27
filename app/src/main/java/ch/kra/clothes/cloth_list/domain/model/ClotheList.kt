@@ -7,4 +7,5 @@ data class ClotheList(
     val username: String,
     val location: String,
     val lastUpdated: Date,
+    val clotheList: List<Clothe>
 )
