@@ -10,11 +10,12 @@ interface UserListDao {
     @Query("SELECT * FROM UserListEntity")
     fun getUsersList(): Flow<List<UserListEntity>>
 
+    @Transaction
     @Query("SELECT * FROM UserListEntity WHERE userId = :id")
     fun getUserListWithClothesByUserId(id: Int): Flow<UserListWithClothesPOJO>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertUserList(userListEntity: UserListEntity)
+    suspend fun insertUserList(userListEntity: UserListEntity): Long
 
     @Update
     suspend fun updateUserList(userListEntity: UserListEntity)
