@@ -2,10 +2,9 @@ package ch.kra.clothes.cloth_list.domain.model
 
 import java.util.*
 
-data class ClotheList(
-    val listId: Int? = null,
+data class UserList(
+    val id: Int? = null,
     val username: String,
     val location: String,
-    val lastUpdated: Date,
-    val clotheList: List<Clothe>
+    val lastUpdated: Date
 )

@@ -4,7 +4,7 @@
     package="ch.kra.clothes">
 
     <application
-        android:name=".ClotesApp"
+        android:name=".ClothesApp"
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"

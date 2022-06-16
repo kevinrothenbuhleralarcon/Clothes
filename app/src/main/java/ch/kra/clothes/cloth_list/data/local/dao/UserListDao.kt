@@ -2,15 +2,16 @@ package ch.kra.clothes.cloth_list.data.local.dao
 
 import androidx.room.*
 import ch.kra.clothes.cloth_list.data.local.entitiy.UserListEntity
+import ch.kra.clothes.cloth_list.data.local.entitiy.UserListWithClothesPOJO
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface UserListDao {
-    @Query("SELECT * FROM tbl_user_list")
+    @Query("SELECT * FROM UserListEntity")
     fun getUsersList(): Flow<List<UserListEntity>>
 
-    @Query("SELECT * FROM tbl_user_list WHERE id = :id")
-    fun getUserListById(id: Int): Flow<UserListEntity>
+    @Query("SELECT * FROM UserListEntity WHERE userId = :id")
+    fun getUserListWithClothesByUserId(id: Int): Flow<UserListWithClothesPOJO>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertUserList(userListEntity: UserListEntity)
@@ -18,6 +19,6 @@ interface UserListDao {
     @Update
     suspend fun updateUserList(userListEntity: UserListEntity)
 
-    @Query("DELETE FROM tbl_user_list WHERE id = :id")
+    @Query("DELETE FROM UserListEntity WHERE userId = :id")
     suspend fun deleteUserList(id: Int)
 }

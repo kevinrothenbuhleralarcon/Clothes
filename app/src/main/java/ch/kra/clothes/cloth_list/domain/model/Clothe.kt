@@ -4,5 +4,6 @@ data class Clothe(
     val id: Int? = null,
     val clothe: String,
     val quantity: Int,
-    val type: ClothType
+    val typeId: Int,
+    val userListId: Int? = null
 )
