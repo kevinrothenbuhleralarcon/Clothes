@@ -8,7 +8,7 @@ data class UserListWithClothesPOJO(
     @Embedded val userList: UserListEntity,
     @Relation(
         parentColumn = "userId",
-        entityColumn = ""
+        entityColumn = "userListId"
     )
     val listClothe: List<ClotheEntity>
 ) {
