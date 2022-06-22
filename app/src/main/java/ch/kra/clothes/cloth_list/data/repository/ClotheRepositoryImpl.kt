@@ -1,5 +1,6 @@
 package ch.kra.clothes.cloth_list.data.repository
 
+import android.util.Log
 import ch.kra.clothes.cloth_list.data.local.dao.ClotheDao
 import ch.kra.clothes.cloth_list.data.local.dao.UserListDao
 import ch.kra.clothes.cloth_list.data.local.entitiy.ClotheEntity
@@ -46,7 +47,7 @@ class ClotheRepositoryImpl(
     override suspend fun updateUserListWithClothes(userListWithClothes: UserListWithClothes) {
         userListWithClothes.userList.id?.let { userId ->
             val userListEntity = UserListEntity(
-                userId = userListWithClothes.userList.id ?: 0,
+                userId = userListWithClothes.userList.id,
                 username = userListWithClothes.userList.username,
                 location = userListWithClothes.userList.location,
                 lastUpdated = userListWithClothes.userList.lastUpdated
@@ -62,7 +63,7 @@ class ClotheRepositoryImpl(
                 )
             }
             // get the currently stored clothes for this userList
-            val currentlyStoredClothes = clotheDao.getClotheList(userId).lastOrNull()
+            val currentlyStoredClothes = clotheDao.getClotheList(userId).firstOrNull()
             // if the list is not null we remove the elements that are no longer present in the current list
             currentlyStoredClothes?.let {
                 val clothesToDelete = it.subtract(clotheEntityList.toSet()).toList()
