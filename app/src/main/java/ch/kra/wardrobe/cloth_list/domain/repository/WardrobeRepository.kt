@@ -5,13 +5,13 @@ import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import kotlinx.coroutines.flow.Flow
 
 interface WardrobeRepository {
-    fun getUsersList(): Flow<List<UserWardrobe>>
+    fun getWardrobes(): Flow<List<UserWardrobe>>
 
-    fun getUserListWithClothById(id: Int): Flow<UserWardrobeWithClothes>
+    fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes>
 
-    suspend fun addUserListWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes)
+    suspend fun addWardrobeWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes)
 
-    suspend fun updateUserListWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes)
+    suspend fun updateWardrobeWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes)
 
-    suspend fun deleteUserListWithClothes(userListId: Int)
+    suspend fun deleteWardrobeWithClothes(userListId: Int)
 }

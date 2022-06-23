@@ -43,16 +43,16 @@ class WardrobeRepositoryImplTest {
             userWardrobe = newUserWardrobe,
             listClothe = emptyList()
         )
-        wardrobeRepository.addUserListWithClothes(userWardrobeWithClothes)
+        wardrobeRepository.addWardrobeWithClothes(userWardrobeWithClothes)
 
-        val flowUserListAfterInsert = wardrobeRepository.getUsersList()
+        val flowUserListAfterInsert = wardrobeRepository.getWardrobes()
         val userListAfterInsert = flowUserListAfterInsert.first()
         assertEquals("The list should contain 1 item", 1, userListAfterInsert.size)
         assertEquals("The username is not correct", "test", userListAfterInsert[0].username)
 
-        wardrobeRepository.deleteUserListWithClothes(userListAfterInsert[0].id!!)
+        wardrobeRepository.deleteWardrobeWithClothes(userListAfterInsert[0].id!!)
 
-        val flowUserListAfterDelete = wardrobeRepository.getUsersList()
+        val flowUserListAfterDelete = wardrobeRepository.getWardrobes()
         val userListAfterDelete = flowUserListAfterDelete.first()
 
         assertEquals("The list should contain 0 item", 0, userListAfterDelete.size)
@@ -76,15 +76,15 @@ class WardrobeRepositoryImplTest {
             userWardrobe = newUserWardrobe,
             listClothe = newClotheList
         )
-        wardrobeRepository.addUserListWithClothes(userWardrobeWithClothes)
+        wardrobeRepository.addWardrobeWithClothes(userWardrobeWithClothes)
 
         // Test the insert and get
-        val flowUserListAfterInsert = wardrobeRepository.getUsersList()
+        val flowUserListAfterInsert = wardrobeRepository.getWardrobes()
         val userListAfterInsert = flowUserListAfterInsert.first()
         assertEquals("The list should contain 1 item", 1, userListAfterInsert.size)
         assertEquals("The username is not correct", "test", userListAfterInsert[0].username)
 
-        val flowUserWithClotheAfterInsert = wardrobeRepository.getUserListWithClothById(userListAfterInsert[0].id!!)
+        val flowUserWithClotheAfterInsert = wardrobeRepository.getWardrobeWithClothesById(userListAfterInsert[0].id!!)
         val userWithClothesAfterInsert = flowUserWithClotheAfterInsert.first()
         assertEquals("The clothe list should contain 4 items", 4, userWithClothesAfterInsert.listClothe.size)
         assertEquals("The first clothe should be T-shirt", "T-shirt", userWithClothesAfterInsert.listClothe[0].clothe)
@@ -103,10 +103,10 @@ class WardrobeRepositoryImplTest {
             userWardrobe = updateUserList,
             listClothe = updateClotheList
         )
-        wardrobeRepository.updateUserListWithClothes(updateUserWardrobeWithClothes)
+        wardrobeRepository.updateWardrobeWithClothes(updateUserWardrobeWithClothes)
 
         // Test the update
-        val flowUserWithClotheAfterUpdate = wardrobeRepository.getUserListWithClothById(userListAfterInsert[0].id!!)
+        val flowUserWithClotheAfterUpdate = wardrobeRepository.getWardrobeWithClothesById(userListAfterInsert[0].id!!)
         val userWithClotheAfterUpdate = flowUserWithClotheAfterUpdate.first()
         assertEquals("The clothe list should contain 4 items", 4, userWithClotheAfterUpdate.listClothe.size)
         assertEquals("The first clothe should be T-shirt", "T-shirt", userWithClotheAfterUpdate.listClothe[0].clothe)
@@ -117,10 +117,10 @@ class WardrobeRepositoryImplTest {
         assertEquals("There should be 20 Sock", 20, userWithClotheAfterUpdate.listClothe[3].quantity)
 
         // Delete
-        wardrobeRepository.deleteUserListWithClothes(userListAfterInsert[0].id!!)
+        wardrobeRepository.deleteWardrobeWithClothes(userListAfterInsert[0].id!!)
 
         // Test the delete
-        val flowUserListAfterDelete = wardrobeRepository.getUsersList()
+        val flowUserListAfterDelete = wardrobeRepository.getWardrobes()
         val userListAfterDelete = flowUserListAfterDelete.first()
 
         assertEquals("The list should contain 0 item", 0, userListAfterDelete.size)

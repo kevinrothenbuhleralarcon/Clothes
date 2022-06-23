@@ -8,18 +8,18 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface UserWardrobeDao {
     @Query("SELECT * FROM UserWardrobeEntity")
-    fun getUsersList(): Flow<List<UserWardrobeEntity>>
+    fun getWardrobes(): Flow<List<UserWardrobeEntity>>
 
     @Transaction
     @Query("SELECT * FROM UserWardrobeEntity WHERE userId = :id")
-    fun getUserListWithClothesByUserId(id: Int): Flow<UserWardrobeWithClothesPOJO>
+    fun getWardrobeWithClothesByUserId(id: Int): Flow<UserWardrobeWithClothesPOJO>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertUserList(userWardrobeEntity: UserWardrobeEntity): Long
+    suspend fun insertWardrobe(userWardrobeEntity: UserWardrobeEntity): Long
 
     @Update
-    suspend fun updateUserList(userWardrobeEntity: UserWardrobeEntity)
+    suspend fun updateWardrobe(userWardrobeEntity: UserWardrobeEntity)
 
     @Query("DELETE FROM UserWardrobeEntity WHERE userId = :id")
-    suspend fun deleteUserList(id: Int)
+    suspend fun deleteWardrobe(id: Int)
 }
