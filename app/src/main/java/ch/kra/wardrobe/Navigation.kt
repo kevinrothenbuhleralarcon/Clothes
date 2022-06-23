@@ -17,7 +17,11 @@ fun Navigation(navController: NavHostController) {
         startDestination = Routes.LIST_WARDROBE
     ) {
         composable(route = Routes.LIST_WARDROBE) {
-            ListWardrobeScreen()
+            ListWardrobeScreen(
+                navigate = { navigateEvent ->
+                    navController.navigate(navigateEvent.route)
+                }
+            )
         }
 
         composable(
