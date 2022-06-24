@@ -8,6 +8,7 @@ sealed class AddEditWardrobeEvents {
     data class TypeChanged(val type: Int): AddEditWardrobeEvents()
     object SaveClothe: AddEditWardrobeEvents()
     object DeleteClothe: AddEditWardrobeEvents()
+    object CancelClothe: AddEditWardrobeEvents()
     object AddClothe: AddEditWardrobeEvents()
     data class UpdateClothe(val id: Int): AddEditWardrobeEvents()
     object SaveWardrobe: AddEditWardrobeEvents()

@@ -18,7 +18,6 @@ data class ClotheEntity(
             clothe = clothe,
             quantity = quantity,
             typeId = typeId,
-            userWardrobeId = userWardrobeId
         )
     }
 }

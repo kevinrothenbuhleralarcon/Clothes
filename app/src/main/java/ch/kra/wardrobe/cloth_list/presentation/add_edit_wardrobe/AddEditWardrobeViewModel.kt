@@ -5,14 +5,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import ch.kra.wardrobe.cloth_list.domain.model.Clothe
+import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
+import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.use_case.*
 import ch.kra.wardrobe.core.UIEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
@@ -89,20 +95,68 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.SaveClothe -> {
+                _currentClothe.value = currentClothe.value.copy(
+                    clotheError = null,
+                    quantityError = null
+                )
 
+                val clotheResult = validateClothe(currentClothe.value.clothe)
+                val quantityResult = validateQuantity(currentClothe.value.quantity)
+
+                val hasError = listOf(
+                    clotheResult,
+                    quantityResult
+                ).any { !it.successful }
+
+                if (hasError) {
+                    _currentClothe.value = currentClothe.value.copy(
+                        clotheError = clotheResult.errorMessage,
+                        quantityError = quantityResult.errorMessage
+                    )
+                    return
+                }
+
+                if (currentClothe.value.id == null) {
+                    _wardrobeFormState.value = wardrobeFormState.value.copy(
+                        clotheList = wardrobeFormState.value.clotheList
+                            .plus(currentClothe.value)
+                            .sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
+                    )
+                } else {
+                    _wardrobeFormState.value = wardrobeFormState.value.copy(
+                        clotheList = wardrobeFormState.value.clotheList.map {
+                            if (it.id == currentClothe.value.id)
+                                currentClothe.value
+                            else
+                                it
+                        }
+                    )
+                }
+                _displayClotheForm.value = false
+            }
+
+            is AddEditWardrobeEvents.CancelClothe -> {
                 _displayClotheForm.value = false
             }
 
             is AddEditWardrobeEvents.DeleteClothe -> {
+                val elementToRemove =
+                    wardrobeFormState.value.clotheList.find { it.id == currentClothe.value.id }
+                elementToRemove?.let {
+                    _wardrobeFormState.value = wardrobeFormState.value.copy(
+                        clotheList = wardrobeFormState.value.clotheList.minus(it)
+                    )
+                }
 
+                _displayClotheForm.value = false
             }
 
             is AddEditWardrobeEvents.SaveWardrobe -> {
-
+                submitData()
             }
 
             is AddEditWardrobeEvents.DeleteWardrobe -> {
-
+                deleteWardrobe()
             }
         }
     }
@@ -114,22 +168,105 @@ class AddEditWardrobeViewModel @Inject constructor(
     }
 
     private fun getWardrobe(id: Int) {
+        getWardrobeWithClothesById(id).onEach { wardrobe ->
+            _wardrobeFormState.value = wardrobeFormState.value.copy(
+                id = wardrobe.userWardrobe.id,
+                username = wardrobe.userWardrobe.username,
+                location = wardrobe.userWardrobe.location,
+                clotheList = wardrobe.listClothe.map { clothe ->
+                    ClotheFormState(
+                        id = clothe.id,
+                        clothe = clothe.clothe,
+                        quantity = clothe.quantity,
+                        type = clothe.typeId
+                    )
+                }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
+            )
+        }.launchIn(viewModelScope)
+    }
+
+    private fun submitData() {
+        _wardrobeFormState.value = wardrobeFormState.value.copy(
+            usernameError = null,
+            locationError = null
+        )
+        val usernameResult = validateUsername(wardrobeFormState.value.username)
+        val locationResult = validateLocation(wardrobeFormState.value.location)
+
+        val hasError = listOf(
+            usernameResult,
+            locationResult
+        ).any { !it.successful }
+
+        if (hasError) {
+            _wardrobeFormState.value = wardrobeFormState.value.copy(
+                usernameError = usernameResult.errorMessage,
+                locationError = locationResult.errorMessage
+            )
+            return
+        }
+
+        if (wardrobeFormState.value.id == null)
+            addWardrobe()
+        else
+            updateWardrobe()
+
+    }
+
+    private fun addWardrobe() {
         viewModelScope.launch {
-            getWardrobeWithClothesById(id).onEach { wardrobe ->
-                _wardrobeFormState.value = wardrobeFormState.value.copy(
-                    id = wardrobe.userWardrobe.id,
-                    username = wardrobe.userWardrobe.username,
-                    location = wardrobe.userWardrobe.location,
-                    clotheList = wardrobe.listClothe.map { clothe ->
-                        ClotheFormState(
-                            id = clothe.id,
-                            clothe = clothe.clothe,
-                            quantity = clothe.quantity,
-                            type = clothe.typeId
+            addWardrobeWithClothes(
+                UserWardrobeWithClothes(
+                    UserWardrobe(
+                        id = null,
+                        username = wardrobeFormState.value.username,
+                        location = wardrobeFormState.value.location,
+                        lastUpdated = Date()
+                    ),
+                    listClothe = wardrobeFormState.value.clotheList.map {
+                        Clothe(
+                            id = it.id,
+                            clothe = it.clothe,
+                            quantity = it.quantity,
+                            typeId = it.type
                         )
-                    }.sortedWith(compareBy<ClotheFormState> { it.id }.thenBy { it.clothe })
+                    }
                 )
-            }.launchIn(this)
+            )
+            sendUiEvent(UIEvent.PopBackStack)
+        }
+    }
+
+    private fun updateWardrobe() {
+        viewModelScope.launch {
+            updateWardrobeWithClothes(
+                UserWardrobeWithClothes(
+                    UserWardrobe(
+                        id = wardrobeFormState.value.id,
+                        username = wardrobeFormState.value.username,
+                        location = wardrobeFormState.value.location,
+                        lastUpdated = Date()
+                    ),
+                    listClothe = wardrobeFormState.value.clotheList.map {
+                        Clothe(
+                            id = it.id,
+                            clothe = it.clothe,
+                            quantity = it.quantity,
+                            typeId = it.type
+                        )
+                    }
+                )
+            )
+            sendUiEvent(UIEvent.PopBackStack)
+        }
+    }
+
+    private fun deleteWardrobe() {
+        wardrobeFormState.value.id?.let {
+            viewModelScope.launch {
+                deleteWardrobeWithClothes(it)
+                sendUiEvent(UIEvent.PopBackStack)
+            }
         }
     }
 }
