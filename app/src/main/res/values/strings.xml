@@ -2,4 +2,8 @@
     <string name="app_name">Wardrobe</string>
     <string name="add_wardrobe">Add wardrobe</string>
     <string name="wardrobes">Wardrobes</string>
+    <string name="username_empty_error">Username cannot be empty</string>
+    <string name="location_empty_error">Location cannot be empty</string>
+    <string name="clothe_empty_error">Clothe cannot be empty</string>
+    <string name="quantity_error">Quantity cannot be negative</string>
 </resources>

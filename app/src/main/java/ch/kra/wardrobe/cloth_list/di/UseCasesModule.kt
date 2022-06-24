@@ -41,4 +41,20 @@ object UseCasesModule {
     fun provideDeleteWardrobeWithClothes(wardrobeRepository: WardrobeRepository): DeleteWardrobeWithClothes {
         return DeleteWardrobeWithClothes(wardrobeRepository)
     }
+
+    @Provides
+    @Singleton
+    fun provideValidateUsername() = ValidateUsername()
+
+    @Provides
+    @Singleton
+    fun provideValidateLocation() = ValidateLocation()
+
+    @Provides
+    @Singleton
+    fun provideValidateClothe() = ValidateClothe()
+
+    @Provides
+    @Singleton
+    fun provideValidateQuantity() = ValidateQuantity()
 }
