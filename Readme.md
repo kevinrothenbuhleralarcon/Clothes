@@ -1,3 +1,3 @@
 Author: Rothenbühler-Alarcon Kevin
 
-Clothe app for clothes listing
+Wardrobe app for clothes listing
