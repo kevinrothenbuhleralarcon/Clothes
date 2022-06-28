@@ -3,20 +3,23 @@ package ch.kra.wardrobe.cloth_list.presentation.list_wardrobe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.kra.wardrobe.cloth_list.domain.use_case.GetWardrobes
+import ch.kra.wardrobe.core.DispatcherProvider
 import ch.kra.wardrobe.core.Routes
 import ch.kra.wardrobe.core.UIEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class ListWardrobeViewModel @Inject constructor(
-    private val getWardrobes: GetWardrobes
+    private val getWardrobes: GetWardrobes,
+    private val dispatcher: DispatcherProvider
 ): ViewModel() {
 
-    val wardrobes = getWardrobes()
+    val wardrobes = getWardrobes().flowOn(dispatcher.io)
 
     private val _uiEvent = Channel<UIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()

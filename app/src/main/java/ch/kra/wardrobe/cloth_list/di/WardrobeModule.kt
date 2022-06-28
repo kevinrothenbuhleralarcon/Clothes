@@ -5,6 +5,8 @@ import androidx.room.Room
 import ch.kra.wardrobe.cloth_list.data.local.WardrobeDatabase
 import ch.kra.wardrobe.cloth_list.data.repository.WardrobeRepositoryImpl
 import ch.kra.wardrobe.cloth_list.domain.repository.WardrobeRepository
+import ch.kra.wardrobe.core.DefaultDispatcher
+import ch.kra.wardrobe.core.DispatcherProvider
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -32,5 +34,11 @@ object WardrobeModule {
             clotheDao = db.clotheDao,
             userWardrobeDao = db.userWardrobeDao
         )
+    }
+
+    @Provides
+    @Singleton
+    fun provideDefaultDispatcher(): DispatcherProvider {
+        return DefaultDispatcher()
     }
 }

@@ -35,6 +35,7 @@ fun ListWardrobeScreen(
         viewModel.uiEvent.collect { event ->
             when (event) {
                 is UIEvent.Navigate -> navigate(event)
+                else -> {}
             }
         }
     }
