@@ -8,6 +8,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.screen.AddEditWardrobeScreen
 import ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.screen.ListWardrobeScreen
+import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import ch.kra.wardrobe.core.Routes
 
 @Composable
@@ -25,9 +26,9 @@ fun Navigation(navController: NavHostController) {
         }
 
         composable(
-            route = Routes.ADD_EDIT_WARDROBE + "?wardrobeId={wardrobeId}",
+            route = Routes.ADD_EDIT_WARDROBE + "?$NAVIGATION_WARDROBE_ID={$NAVIGATION_WARDROBE_ID}",
             arguments = listOf(
-                navArgument("wardrobeId") {
+                navArgument(NAVIGATION_WARDROBE_ID) {
                     type = NavType.IntType
                     defaultValue = -1
                 }

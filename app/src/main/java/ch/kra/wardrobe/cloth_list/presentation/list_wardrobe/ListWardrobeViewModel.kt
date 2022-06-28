@@ -3,6 +3,7 @@ package ch.kra.wardrobe.cloth_list.presentation.list_wardrobe
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import ch.kra.wardrobe.cloth_list.domain.use_case.GetWardrobes
+import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import ch.kra.wardrobe.core.DispatcherProvider
 import ch.kra.wardrobe.core.Routes
 import ch.kra.wardrobe.core.UIEvent
@@ -36,7 +37,7 @@ class ListWardrobeViewModel @Inject constructor(
                 sendUIEvent(
                     UIEvent.Navigate(
                         Routes.ADD_EDIT_WARDROBE +
-                                "?wardrobeId=${event.id}"
+                                "?$NAVIGATION_WARDROBE_ID=${event.id}"
                     )
                 )
             }

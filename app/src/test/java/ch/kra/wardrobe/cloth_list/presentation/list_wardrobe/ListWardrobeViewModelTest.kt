@@ -8,6 +8,7 @@ import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.repository.WardrobeRepository
 import ch.kra.wardrobe.cloth_list.domain.use_case.GetWardrobes
+import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import ch.kra.wardrobe.core.Routes
 import ch.kra.wardrobe.core.UIEvent
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -85,7 +86,7 @@ class ListWardrobeViewModelTest {
         viewModel.uiEvent.test {
             val event = awaitItem()
             if (event is UIEvent.Navigate)
-                assertEquals("The route is not correct", Routes.ADD_EDIT_WARDROBE + "?wardrobeId=$id", event.route)
+                assertEquals("The route is not correct", Routes.ADD_EDIT_WARDROBE + "?$NAVIGATION_WARDROBE_ID=$id", event.route)
             else
                 fail("event is not UIEvent.Navigate")
             cancelAndIgnoreRemainingEvents()

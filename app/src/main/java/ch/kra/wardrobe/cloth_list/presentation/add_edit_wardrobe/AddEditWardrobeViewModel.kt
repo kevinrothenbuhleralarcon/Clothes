@@ -9,9 +9,10 @@ import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.use_case.*
+import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
+import ch.kra.wardrobe.core.DispatcherProvider
 import ch.kra.wardrobe.core.UIEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
@@ -31,6 +32,7 @@ class AddEditWardrobeViewModel @Inject constructor(
     private val validateLocation: ValidateLocation,
     private val validateClothe: ValidateClothe,
     private val validateQuantity: ValidateQuantity,
+    private val dispatcher: DispatcherProvider,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -47,7 +49,7 @@ class AddEditWardrobeViewModel @Inject constructor(
     val uiEvent = _uiEvent.receiveAsFlow()
 
     init {
-        savedStateHandle.get<Int>("wardrobeId")?.let { id ->
+        savedStateHandle.get<Int>(NAVIGATION_WARDROBE_ID)?.let { id ->
             if (id > -1) getWardrobe(id)
         }
     }
@@ -182,7 +184,9 @@ class AddEditWardrobeViewModel @Inject constructor(
                     )
                 }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
             )
-        }.launchIn(viewModelScope)
+        }
+            .flowOn(dispatcher.io)
+            .launchIn(viewModelScope)
     }
 
     private fun submitData() {
@@ -214,7 +218,7 @@ class AddEditWardrobeViewModel @Inject constructor(
     }
 
     private fun addWardrobe() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher.io) {
             addWardrobeWithClothes(
                 UserWardrobeWithClothes(
                     UserWardrobe(
@@ -238,7 +242,7 @@ class AddEditWardrobeViewModel @Inject constructor(
     }
 
     private fun updateWardrobe() {
-        viewModelScope.launch {
+        viewModelScope.launch(dispatcher.io) {
             updateWardrobeWithClothes(
                 UserWardrobeWithClothes(
                     UserWardrobe(
@@ -263,7 +267,7 @@ class AddEditWardrobeViewModel @Inject constructor(
 
     private fun deleteWardrobe() {
         wardrobeFormState.value.id?.let {
-            viewModelScope.launch {
+            viewModelScope.launch(dispatcher.io) {
                 deleteWardrobeWithClothes(it)
                 sendUiEvent(UIEvent.PopBackStack)
             }
