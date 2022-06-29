@@ -34,7 +34,11 @@ fun Navigation(navController: NavHostController) {
                 }
             )
         ) {
-            AddEditWardrobeScreen()
+            AddEditWardrobeScreen(
+                popBackStack = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

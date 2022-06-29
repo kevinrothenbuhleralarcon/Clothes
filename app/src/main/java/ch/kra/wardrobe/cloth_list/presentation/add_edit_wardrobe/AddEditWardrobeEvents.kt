@@ -13,4 +13,5 @@ sealed class AddEditWardrobeEvents {
     data class UpdateClothe(val id: Int): AddEditWardrobeEvents()
     object SaveWardrobe: AddEditWardrobeEvents()
     object DeleteWardrobe: AddEditWardrobeEvents()
+    object NavigateBackPressed: AddEditWardrobeEvents()
 }

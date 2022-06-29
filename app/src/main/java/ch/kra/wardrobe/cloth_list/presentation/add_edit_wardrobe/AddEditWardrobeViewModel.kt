@@ -160,6 +160,10 @@ class AddEditWardrobeViewModel @Inject constructor(
             is AddEditWardrobeEvents.DeleteWardrobe -> {
                 deleteWardrobe()
             }
+
+            is AddEditWardrobeEvents.NavigateBackPressed -> {
+                sendUiEvent(UIEvent.PopBackStack)
+            }
         }
     }
 
