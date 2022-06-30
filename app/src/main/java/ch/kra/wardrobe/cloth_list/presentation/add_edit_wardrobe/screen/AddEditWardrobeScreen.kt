@@ -1,6 +1,8 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.screen
 
 import android.util.Log
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -12,8 +14,10 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
@@ -71,16 +75,16 @@ fun AddEditWardrobeScreen(
                             )
                         )
                     }
+                },
+                actions = {
+                    IconButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.AddClothe) }) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = stringResource(R.string.add_clothe)
+                        )
+                    }
                 }
             )
-        },
-        floatingActionButton = {
-            FloatingActionButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.AddClothe) }) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_clothe)
-                )
-            }
         }
     ) { pv ->
         Column(
@@ -90,8 +94,7 @@ fun AddEditWardrobeScreen(
         ) {
             LazyColumn(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(pv),
+                    .weight(1f),
                 contentPadding = PaddingValues(8.dp)
             ) {
                 item {
@@ -112,7 +115,8 @@ fun AddEditWardrobeScreen(
                             },
                             label = { Text(text = stringResource(R.string.username)) },
                             isError = wardrobeFormState.usernameError != null,
-                            singleLine = true
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
                         )
                         if (wardrobeFormState.usernameError != null) {
                             Text(
@@ -132,7 +136,8 @@ fun AddEditWardrobeScreen(
                             },
                             label = { Text(text = stringResource(R.string.location)) },
                             isError = wardrobeFormState.locationError != null,
-                            singleLine = true
+                            singleLine = true,
+                            modifier = Modifier.fillMaxWidth()
                         )
                         if (wardrobeFormState.locationError != null) {
                             Text(
@@ -140,6 +145,9 @@ fun AddEditWardrobeScreen(
                                 color = MaterialTheme.colors.error
                             )
                         }
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
                         Divider(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -149,7 +157,7 @@ fun AddEditWardrobeScreen(
                 }
 
                 items(wardrobeFormState.clotheList.size) { id ->
-                    Row(modifier = Modifier.fillMaxWidth()) {
+                    Row(modifier = Modifier.fillMaxWidth().clickable { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(id)) }) {
                         Text(text = wardrobeFormState.clotheList[id].clothe)
                         Text(text = wardrobeFormState.clotheList[id].quantity.toString())
                     }
@@ -181,8 +189,6 @@ private fun ClotheDialog(
     data: ClotheFormState,
     onEvent: (AddEditWardrobeEvents) -> Unit
 ) {
-    val focusManager = LocalFocusManager.current
-
     if (showDialog) {
         Dialog(
             onDismissRequest = { /*TODO*/ },
@@ -193,13 +199,19 @@ private fun ClotheDialog(
                 color = MaterialTheme.colors.surface,
                 modifier = Modifier.padding(horizontal = 16.dp)
             ) {
-                Column {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     OutlinedTextField(
                         value = data.clothe,
                         onValueChange = { onEvent(AddEditWardrobeEvents.ClotheChanged(it)) },
                         label = { Text(text = stringResource(R.string.clothe)) },
                         isError = data.clotheError != null,
-                        singleLine = true
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
                     )
                     if (data.clotheError != null) {
                         Text(
@@ -210,11 +222,18 @@ private fun ClotheDialog(
 
                     OutlinedTextField(
                         value = data.quantity.toString(),
-                        onValueChange = { onEvent(AddEditWardrobeEvents.QuantityChanged(it.toIntOrNull() ?: -1)) },
+                        onValueChange = {
+                            onEvent(
+                                AddEditWardrobeEvents.QuantityChanged(
+                                    it.toIntOrNull() ?: -1
+                                )
+                            )
+                        },
                         label = { Text(text = stringResource(R.string.quantity)) },
                         isError = data.quantityError != null,
                         singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        modifier = Modifier.fillMaxWidth()
                     )
                     if (data.quantityError != null) {
                         Text(
@@ -227,11 +246,19 @@ private fun ClotheDialog(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
-                        Button(onClick = { onEvent(AddEditWardrobeEvents.SaveClothe) }) {
+                        Button(
+                            modifier = Modifier.fillMaxWidth(0.5f),
+                            onClick = { onEvent(AddEditWardrobeEvents.SaveClothe) }
+                        ) {
                             Text(text = stringResource(R.string.save))
                         }
-
-                        Button(onClick = { onEvent(AddEditWardrobeEvents.CancelClothe) }) {
+                        
+                        Spacer(modifier = Modifier.width(6.dp))
+                        
+                        Button(
+                            modifier = Modifier.fillMaxWidth(1f),
+                            onClick = { onEvent(AddEditWardrobeEvents.CancelClothe) }
+                        ) {
                             Text(text = stringResource(R.string.cancel))
                         }
 
