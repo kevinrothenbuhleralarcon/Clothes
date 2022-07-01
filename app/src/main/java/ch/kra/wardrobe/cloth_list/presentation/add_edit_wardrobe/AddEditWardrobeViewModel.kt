@@ -1,5 +1,6 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
 
+import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -162,6 +163,7 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.NavigateBackPressed -> {
+                Log.d("Test", "coucou")
                 sendUiEvent(UIEvent.PopBackStack)
             }
         }

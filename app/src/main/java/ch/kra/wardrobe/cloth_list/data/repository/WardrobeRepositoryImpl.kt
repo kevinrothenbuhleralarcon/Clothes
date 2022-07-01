@@ -19,7 +19,6 @@ class WardrobeRepositoryImpl(
     }
 
     override fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes?> {
-        Log.d("getError","inside repo by Id")
         return userWardrobeDao.getWardrobeWithClothesByUserId(id).map { it?.toUserListWithClothes() }
     }
 

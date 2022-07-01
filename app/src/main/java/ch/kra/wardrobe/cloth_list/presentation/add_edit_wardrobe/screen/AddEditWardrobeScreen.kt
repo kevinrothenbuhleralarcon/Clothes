@@ -1,6 +1,8 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.screen
 
 import android.util.Log
+import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,8 +14,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -43,6 +44,10 @@ fun AddEditWardrobeScreen(
     val wardrobeFormState = viewModel.wardrobeFormState.value
     val currentClotheState = viewModel.currentClothe.value
     val displayClotheForm = viewModel.displayClotheForm.value
+
+    BackHandler {
+
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.uiEvent.collect { event ->
