@@ -236,7 +236,7 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertEquals("quantity is not 0", 0, viewModel.currentClothe.value.quantity)
+        assertNull("quantity is not null", viewModel.currentClothe.value.quantity)
 
         val newQuantity = 10
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(newQuantity))
@@ -296,7 +296,7 @@ class AddEditWardrobeViewModelTest {
 
             viewModel.onEvent(AddEditWardrobeEvents.AddClothe)
             assertEquals("Clothe is not correct", "", viewModel.currentClothe.value.clothe)
-            assertEquals("Quantity is not correct", 0, viewModel.currentClothe.value.quantity)
+            assertNull("Quantity is not correct", viewModel.currentClothe.value.quantity)
             assertEquals("Type is not correct", 0, viewModel.currentClothe.value.type)
             assertTrue("displayClothe should be true", viewModel.displayClotheForm.value)
         }
@@ -328,7 +328,7 @@ class AddEditWardrobeViewModelTest {
                 viewModel.wardrobeFormState.value.clotheList.last().clothe
             )
             assertEquals("Clothe is not correct", "", viewModel.currentClothe.value.clothe)
-            assertEquals("Quantity is not correct", 0, viewModel.currentClothe.value.quantity)
+            assertNull("Quantity is not correct", viewModel.currentClothe.value.quantity)
             assertEquals("Type is not correct", 0, viewModel.currentClothe.value.type)
             assertFalse("displayClothe should be false", viewModel.displayClotheForm.value)
 
@@ -371,6 +371,7 @@ class AddEditWardrobeViewModelTest {
         assertNull("QuantityError is not null", viewModel.currentClothe.value.quantityError)
         assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
 
+        viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(5))
         viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
         assertNotNull("ClotheError is null", viewModel.currentClothe.value.clotheError)
         assertNull("QuantityError is not null", viewModel.currentClothe.value.quantityError)

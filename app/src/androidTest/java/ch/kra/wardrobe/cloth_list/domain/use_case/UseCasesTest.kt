@@ -82,30 +82,58 @@ class UseCasesTest {
 
         val user1WardrobeWithClothesFlow = getWardrobeWithClothesById(wardrobes[0].id!!)
         val user1WardrobeWithClothes = user1WardrobeWithClothesFlow.first()
-        assertEquals("The wardrobe should belong to: User1", "User1", user1WardrobeWithClothes.userWardrobe.username)
-        assertEquals("The wardrobe location should be: Location 1", "Location 1", user1WardrobeWithClothes.userWardrobe.location)
-        assertEquals("The cloth list should contain 3 items", 3, user1WardrobeWithClothes.listClothe.size)
-        assertEquals("The first item should be: T-Shirt", "T-Shirt", user1WardrobeWithClothes.listClothe[0].clothe)
-        assertEquals("There should be 5 T-Shirt in the wardrobe", 5, user1WardrobeWithClothes.listClothe[0].quantity)
+        user1WardrobeWithClothes?.let {
+            assertEquals("The wardrobe should belong to: User1", "User1", it.userWardrobe.username)
+            assertEquals(
+                "The wardrobe location should be: Location 1",
+                "Location 1",
+                it.userWardrobe.location
+            )
+            assertEquals("The cloth list should contain 3 items", 3, it.listClothe.size)
+            assertEquals("The first item should be: T-Shirt", "T-Shirt", it.listClothe[0].clothe)
+            assertEquals("There should be 5 T-Shirt in the wardrobe", 5, it.listClothe[0].quantity)
 
-        val updatedUser1ClotheList = user1WardrobeWithClothes.listClothe.toMutableList()
-        updatedUser1ClotheList[0] = updatedUser1ClotheList[0].copy(quantity = 6)
+            val updatedUser1ClotheList = user1WardrobeWithClothes.listClothe.toMutableList()
+            updatedUser1ClotheList[0] = updatedUser1ClotheList[0].copy(quantity = 6)
 
-        val updatedUser1Wardrobe = user1WardrobeWithClothes.copy(
-            userWardrobe = user1WardrobeWithClothes.userWardrobe.copy(
-                location = "New location 1"
-            ),
-            listClothe = updatedUser1ClotheList
-        )
-        updateWardrobeWithClothes(updatedUser1Wardrobe)
+            val updatedUser1Wardrobe = user1WardrobeWithClothes.copy(
+                userWardrobe = user1WardrobeWithClothes.userWardrobe.copy(
+                    location = "New location 1"
+                ),
+                listClothe = updatedUser1ClotheList
+            )
+            updateWardrobeWithClothes(updatedUser1Wardrobe)
 
-        val user1UpdatedWardrobeWithClothesFlow = getWardrobeWithClothesById(wardrobes[0].id!!)
-        val user1UpdatedWardrobeWithClothes = user1UpdatedWardrobeWithClothesFlow.first()
-        assertEquals("The wardrobe should belong to: User1", "User1", user1UpdatedWardrobeWithClothes.userWardrobe.username)
-        assertEquals("The wardrobe location should be: New location 1", "New location 1", user1UpdatedWardrobeWithClothes.userWardrobe.location)
-        assertEquals("The cloth list should contain 3 items", 3, user1UpdatedWardrobeWithClothes.listClothe.size)
-        assertEquals("The first item should be: T-Shirt", "T-Shirt", user1UpdatedWardrobeWithClothes.listClothe[0].clothe)
-        assertEquals("There should be 6 T-Shirt in the wardrobe", 6, user1UpdatedWardrobeWithClothes.listClothe[0].quantity)
+            val user1UpdatedWardrobeWithClothesFlow = getWardrobeWithClothesById(wardrobes[0].id!!)
+            val user1UpdatedWardrobeWithClothes = user1UpdatedWardrobeWithClothesFlow.first()
+            user1UpdatedWardrobeWithClothes?.let { updatedWardrobe ->
+                assertEquals(
+                    "The wardrobe should belong to: User1",
+                    "User1",
+                    updatedWardrobe.userWardrobe.username
+                )
+                assertEquals(
+                    "The wardrobe location should be: New location 1",
+                    "New location 1",
+                    updatedWardrobe.userWardrobe.location
+                )
+                assertEquals(
+                    "The cloth list should contain 3 items",
+                    3,
+                    updatedWardrobe.listClothe.size
+                )
+                assertEquals(
+                    "The first item should be: T-Shirt",
+                    "T-Shirt",
+                    updatedWardrobe.listClothe[0].clothe
+                )
+                assertEquals(
+                    "There should be 6 T-Shirt in the wardrobe",
+                    6,
+                    updatedWardrobe.listClothe[0].quantity
+                )
+            } ?: fail()
+        } ?: fail()
 
         deleteWardrobeWithClothes(wardrobes[0].id!!)
 

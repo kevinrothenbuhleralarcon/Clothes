@@ -5,7 +5,8 @@
     <string name="username_empty_error">Username cannot be empty</string>
     <string name="location_empty_error">Location cannot be empty</string>
     <string name="clothe_empty_error">Clothe cannot be empty</string>
-    <string name="quantity_error">Quantity cannot be negative</string>
+    <string name="quantity_negative_error">Quantity cannot be negative</string>
+    <string name="quantity_null_error">Quantity cannot be empty</string>
     <string name="new_wardrobe">New wardrobe</string>
     <string name="edit_wardrobe">Edit wardrobe</string>
     <string name="back">Back</string>
@@ -15,6 +16,9 @@
     <string name="clothe">Clothe</string>
     <string name="quantity">Quantity</string>
     <string name="save">Save</string>
-    <string name="cancel">Cancel</string>
     <string name="delete">Delete</string>
+    <string name="back_alert_title">Wardrobe not saved</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="alert_dialog_message">Modification will be lost, do you wish to continue?</string>
 </resources>

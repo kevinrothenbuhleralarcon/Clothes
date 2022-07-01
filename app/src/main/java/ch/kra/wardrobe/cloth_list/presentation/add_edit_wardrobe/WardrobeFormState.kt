@@ -15,7 +15,8 @@ data class ClotheFormState(
     val id: Int? = null,
     val clothe: String = "",
     val clotheError: UIText? = null,
-    val quantity: Int = 0,
+    val quantity: Int? = null,
     val quantityError: UIText? = null,
-    val type: Int = 0
+    val type: Int = 0,
+    val update: Boolean = false
 )

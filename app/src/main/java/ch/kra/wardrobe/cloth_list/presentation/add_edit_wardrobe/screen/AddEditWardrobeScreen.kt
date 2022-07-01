@@ -31,6 +31,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import ch.kra.wardrobe.R
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AddEditWardrobeEvents
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AddEditWardrobeViewModel
+import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AlertDialogSelection
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.ClotheFormState
 import ch.kra.wardrobe.core.UIEvent
 
@@ -44,9 +45,10 @@ fun AddEditWardrobeScreen(
     val wardrobeFormState = viewModel.wardrobeFormState.value
     val currentClotheState = viewModel.currentClothe.value
     val displayClotheForm = viewModel.displayClotheForm.value
+    val displayBackDialog = viewModel.displayBackDialog.value
 
     BackHandler {
-
+        viewModel.onEvent(AddEditWardrobeEvents.NavigateBackPressed)
     }
 
     LaunchedEffect(key1 = true) {
@@ -162,7 +164,9 @@ fun AddEditWardrobeScreen(
                 }
 
                 items(wardrobeFormState.clotheList.size) { id ->
-                    Row(modifier = Modifier.fillMaxWidth().clickable { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(id)) }) {
+                    Row(modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(id)) }) {
                         Text(text = wardrobeFormState.clotheList[id].clothe)
                         Text(text = wardrobeFormState.clotheList[id].quantity.toString())
                     }
@@ -183,6 +187,20 @@ fun AddEditWardrobeScreen(
                     }
                 }
             }
+
+            if (displayBackDialog) {
+                AlertDialog(
+                    onDismissRequest = { /*Nothing*/ },
+                    title = { Text(text = stringResource(R.string.back_alert_title)) },
+                    text = { Text(text = stringResource(R.string.alert_dialog_message)) },
+                    confirmButton = { Button(onClick = { viewModel.onEvent(AddEditWardrobeEvents.OnAlertDialogSelection(AlertDialogSelection.PositiveSelection)) }) {
+                        Text(text = stringResource(R.string.yes))
+                    } },
+                    dismissButton = { Button(onClick = { viewModel.onEvent(AddEditWardrobeEvents.OnAlertDialogSelection(AlertDialogSelection.NegativeSelection)) }) {
+                        Text(text = stringResource(id = R.string.no))
+                    } }
+                )
+            }
         }
     }
 }
@@ -196,7 +214,7 @@ private fun ClotheDialog(
 ) {
     if (showDialog) {
         Dialog(
-            onDismissRequest = { /*TODO*/ },
+            onDismissRequest = { onEvent(AddEditWardrobeEvents.CancelClothe) },
             properties = DialogProperties(usePlatformDefaultWidth = false) // Workaround so that the dialog resize correctly
         ) {
             Surface(
@@ -226,11 +244,11 @@ private fun ClotheDialog(
                     }
 
                     OutlinedTextField(
-                        value = data.quantity.toString(),
+                        value = data.quantity?.toString() ?: "",
                         onValueChange = {
                             onEvent(
                                 AddEditWardrobeEvents.QuantityChanged(
-                                    it.toIntOrNull() ?: -1
+                                    it.toIntOrNull()
                                 )
                             )
                         },
@@ -252,23 +270,18 @@ private fun ClotheDialog(
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Button(
-                            modifier = Modifier.fillMaxWidth(0.5f),
+                            modifier = Modifier.fillMaxWidth(if (!data.update) 1f else 0.5f),
                             onClick = { onEvent(AddEditWardrobeEvents.SaveClothe) }
                         ) {
                             Text(text = stringResource(R.string.save))
                         }
-                        
-                        Spacer(modifier = Modifier.width(6.dp))
-                        
-                        Button(
-                            modifier = Modifier.fillMaxWidth(1f),
-                            onClick = { onEvent(AddEditWardrobeEvents.CancelClothe) }
-                        ) {
-                            Text(text = stringResource(R.string.cancel))
-                        }
 
-                        if (data.id != null) {
-                            Button(onClick = { onEvent(AddEditWardrobeEvents.DeleteClothe) }) {
+                        if (data.update) {
+                            Spacer(modifier = Modifier.width(6.dp))
+                            Button(
+                                onClick = { onEvent(AddEditWardrobeEvents.DeleteClothe) },
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                                 Text(text = stringResource(R.string.delete))
                             }
                         }

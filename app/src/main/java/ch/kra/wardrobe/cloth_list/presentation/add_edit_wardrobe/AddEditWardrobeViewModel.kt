@@ -49,6 +49,11 @@ class AddEditWardrobeViewModel @Inject constructor(
     private val _uiEvent = Channel<UIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
+    private val _displayBackDialog = mutableStateOf(false)
+    val displayBackDialog: State<Boolean> = _displayBackDialog
+
+    private var hasUnsavedChanged = false
+
     init {
         savedStateHandle.get<Int>(NAVIGATION_WARDROBE_ID)?.let { id ->
             if (id > -1) getWardrobe(id)
@@ -61,12 +66,14 @@ class AddEditWardrobeViewModel @Inject constructor(
                 _wardrobeFormState.value = wardrobeFormState.value.copy(
                     username = event.username
                 )
+                hasUnsavedChanged = true
             }
 
             is AddEditWardrobeEvents.LocationChanged -> {
                 _wardrobeFormState.value = wardrobeFormState.value.copy(
                     location = event.location
                 )
+                hasUnsavedChanged = true
             }
 
             is AddEditWardrobeEvents.ClotheChanged -> {
@@ -93,7 +100,7 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.UpdateClothe -> {
-                _currentClothe.value = wardrobeFormState.value.clotheList[event.id].copy()
+                _currentClothe.value = wardrobeFormState.value.clotheList[event.id].copy(update = true)
                 _displayClotheForm.value = true
             }
 
@@ -119,7 +126,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                     return
                 }
 
-                if (currentClothe.value.id == null) {
+                if (!currentClothe.value.update) {
                     _wardrobeFormState.value = wardrobeFormState.value.copy(
                         clotheList = wardrobeFormState.value.clotheList
                             .plus(currentClothe.value)
@@ -129,13 +136,14 @@ class AddEditWardrobeViewModel @Inject constructor(
                     _wardrobeFormState.value = wardrobeFormState.value.copy(
                         clotheList = wardrobeFormState.value.clotheList.map {
                             if (it.id == currentClothe.value.id)
-                                currentClothe.value
+                                currentClothe.value.copy(update = false)
                             else
                                 it
                         }
                     )
                 }
                 _displayClotheForm.value = false
+                hasUnsavedChanged = true
             }
 
             is AddEditWardrobeEvents.CancelClothe -> {
@@ -152,6 +160,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                 }
 
                 _displayClotheForm.value = false
+                hasUnsavedChanged = true
             }
 
             is AddEditWardrobeEvents.SaveWardrobe -> {
@@ -163,8 +172,25 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.NavigateBackPressed -> {
-                Log.d("Test", "coucou")
-                sendUiEvent(UIEvent.PopBackStack)
+                if (hasUnsavedChanged) {
+                    _displayBackDialog.value = true
+                }
+                else {
+                    sendUiEvent(UIEvent.PopBackStack)
+                }
+            }
+
+            is AddEditWardrobeEvents.OnAlertDialogSelection -> {
+                _displayBackDialog.value = false
+                when (event.selection) {
+                    is AlertDialogSelection.PositiveSelection -> {
+                        sendUiEvent(UIEvent.PopBackStack)
+                    }
+
+                    is AlertDialogSelection.NegativeSelection -> {
+
+                    }
+                }
             }
         }
     }
@@ -240,7 +266,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                         Clothe(
                             id = it.id,
                             clothe = it.clothe,
-                            quantity = it.quantity,
+                            quantity = it.quantity ?: 0,
                             typeId = it.type
                         )
                     }
@@ -264,7 +290,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                         Clothe(
                             id = it.id,
                             clothe = it.clothe,
-                            quantity = it.quantity,
+                            quantity = it.quantity ?: 0,
                             typeId = it.type
                         )
                     }

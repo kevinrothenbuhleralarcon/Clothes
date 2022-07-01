@@ -1,6 +1,7 @@
 package ch.kra.wardrobe
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -11,6 +12,7 @@ import ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.screen.ListWardrobe
 import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import ch.kra.wardrobe.core.Routes
 
+@ExperimentalComposeUiApi
 @Composable
 fun Navigation(navController: NavHostController) {
     NavHost(

@@ -86,16 +86,19 @@ class WardrobeRepositoryImplTest {
 
         val flowUserWithClotheAfterInsert = wardrobeRepository.getWardrobeWithClothesById(userListAfterInsert[0].id!!)
         val userWithClothesAfterInsert = flowUserWithClotheAfterInsert.first()
-        assertEquals("The clothe list should contain 4 items", 4, userWithClothesAfterInsert.listClothe.size)
-        assertEquals("The first clothe should be T-shirt", "T-shirt", userWithClothesAfterInsert.listClothe[0].clothe)
-        assertEquals("The second clothe should be Jeans", "Jeans", userWithClothesAfterInsert.listClothe[1].clothe)
-        assertEquals("The third clothe should be Short", "Short", userWithClothesAfterInsert.listClothe[2].clothe)
-        assertEquals("The forth clothe should be Pullover", "Pullover", userWithClothesAfterInsert.listClothe[3].clothe)
-        assertEquals("There should be 5 T-shirt", 5, userWithClothesAfterInsert.listClothe[0].quantity)
+        userWithClothesAfterInsert?.let{
+            assertEquals("The clothe list should contain 4 items", 4, it.listClothe.size)
+            assertEquals("The first clothe should be T-shirt", "T-shirt", it.listClothe[0].clothe)
+            assertEquals("The second clothe should be Jeans", "Jeans", it.listClothe[1].clothe)
+            assertEquals("The third clothe should be Short", "Short", it.listClothe[2].clothe)
+            assertEquals("The forth clothe should be Pullover", "Pullover", it.listClothe[3].clothe)
+            assertEquals("There should be 5 T-shirt", 5, it.listClothe[0].quantity)
+        } ?: fail()
+
 
         // Update
         val updateUserList = newUserWardrobe.copy(id = userListAfterInsert[0].id, username = "Kevin", location = "Belmont-sur-Lausanne")
-        val updateClotheList = userWithClothesAfterInsert.listClothe.toMutableList()
+        val updateClotheList = userWithClothesAfterInsert!!.listClothe.toMutableList()
         updateClotheList[0] = updateClotheList[0].copy(quantity = 6)
         updateClotheList.add(Clothe(clothe = "Socks", quantity = 20, typeId = 8))
         updateClotheList.removeAt(2)
@@ -108,13 +111,16 @@ class WardrobeRepositoryImplTest {
         // Test the update
         val flowUserWithClotheAfterUpdate = wardrobeRepository.getWardrobeWithClothesById(userListAfterInsert[0].id!!)
         val userWithClotheAfterUpdate = flowUserWithClotheAfterUpdate.first()
-        assertEquals("The clothe list should contain 4 items", 4, userWithClotheAfterUpdate.listClothe.size)
-        assertEquals("The first clothe should be T-shirt", "T-shirt", userWithClotheAfterUpdate.listClothe[0].clothe)
-        assertEquals("The second clothe should be Jeans", "Jeans", userWithClotheAfterUpdate.listClothe[1].clothe)
-        assertEquals("The third clothe should be Pullover", "Pullover", userWithClotheAfterUpdate.listClothe[2].clothe)
-        assertEquals("The forth clothe should be Socks", "Socks", userWithClotheAfterUpdate.listClothe[3].clothe)
-        assertEquals("There should be 6 T-shirt", 6, userWithClotheAfterUpdate.listClothe[0].quantity)
-        assertEquals("There should be 20 Sock", 20, userWithClotheAfterUpdate.listClothe[3].quantity)
+        userWithClotheAfterUpdate?.let {
+            assertEquals("The clothe list should contain 4 items", 4, it.listClothe.size)
+            assertEquals("The first clothe should be T-shirt", "T-shirt", it.listClothe[0].clothe)
+            assertEquals("The second clothe should be Jeans", "Jeans", it.listClothe[1].clothe)
+            assertEquals("The third clothe should be Pullover", "Pullover", it.listClothe[2].clothe)
+            assertEquals("The forth clothe should be Socks", "Socks", it.listClothe[3].clothe)
+            assertEquals("There should be 6 T-shirt", 6, it.listClothe[0].quantity)
+            assertEquals("There should be 20 Sock", 20, it.listClothe[3].quantity)
+        }
+
 
         // Delete
         wardrobeRepository.deleteWardrobeWithClothes(userListAfterInsert[0].id!!)
