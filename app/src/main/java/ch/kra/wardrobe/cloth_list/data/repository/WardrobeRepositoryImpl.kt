@@ -1,5 +1,6 @@
 package ch.kra.wardrobe.cloth_list.data.repository
 
+import android.util.Log
 import ch.kra.wardrobe.cloth_list.data.local.dao.ClotheDao
 import ch.kra.wardrobe.cloth_list.data.local.dao.UserWardrobeDao
 import ch.kra.wardrobe.cloth_list.data.local.entitiy.ClotheEntity
@@ -17,8 +18,9 @@ class WardrobeRepositoryImpl(
         return userWardrobeDao.getWardrobes().map { list -> list.map { it.toUserList() } }
     }
 
-    override fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes> {
-        return userWardrobeDao.getWardrobeWithClothesByUserId(id).map { it.toUserListWithClothes() }
+    override fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes?> {
+        Log.d("getError","inside repo by Id")
+        return userWardrobeDao.getWardrobeWithClothesByUserId(id).map { it?.toUserListWithClothes() }
     }
 
     override suspend fun addWardrobeWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes) {

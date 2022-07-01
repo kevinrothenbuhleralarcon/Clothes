@@ -174,20 +174,23 @@ class AddEditWardrobeViewModel @Inject constructor(
     }
 
     private fun getWardrobe(id: Int) {
-        getWardrobeWithClothesById(id).onEach { wardrobe ->
-            _wardrobeFormState.value = wardrobeFormState.value.copy(
-                id = wardrobe.userWardrobe.id,
-                username = wardrobe.userWardrobe.username,
-                location = wardrobe.userWardrobe.location,
-                clotheList = wardrobe.listClothe.map { clothe ->
-                    ClotheFormState(
-                        id = clothe.id,
-                        clothe = clothe.clothe,
-                        quantity = clothe.quantity,
-                        type = clothe.typeId
-                    )
-                }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
-            )
+        getWardrobeWithClothesById(id).onEach { wardrobeOrNull ->
+            wardrobeOrNull?.let { wardrobe ->
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    id = wardrobe.userWardrobe.id,
+                    username = wardrobe.userWardrobe.username,
+                    location = wardrobe.userWardrobe.location,
+                    clotheList = wardrobe.listClothe.map { clothe ->
+                        ClotheFormState(
+                            id = clothe.id,
+                            clothe = clothe.clothe,
+                            quantity = clothe.quantity,
+                            type = clothe.typeId
+                        )
+                    }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
+                )
+            }
+
         }
             .flowOn(dispatcher.io)
             .launchIn(viewModelScope)

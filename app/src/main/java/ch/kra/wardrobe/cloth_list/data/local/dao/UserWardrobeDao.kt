@@ -12,7 +12,7 @@ interface UserWardrobeDao {
 
     @Transaction
     @Query("SELECT * FROM UserWardrobeEntity WHERE userId = :id")
-    fun getWardrobeWithClothesByUserId(id: Int): Flow<UserWardrobeWithClothesPOJO>
+    fun getWardrobeWithClothesByUserId(id: Int): Flow<UserWardrobeWithClothesPOJO?>
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insertWardrobe(userWardrobeEntity: UserWardrobeEntity): Long

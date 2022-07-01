@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface WardrobeRepository {
     fun getWardrobes(): Flow<List<UserWardrobe>>
 
-    fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes>
+    fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes?>
 
     suspend fun addWardrobeWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes)
 

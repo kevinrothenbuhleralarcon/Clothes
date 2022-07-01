@@ -13,10 +13,8 @@ class FakeWardrobeRepositoryImpl: WardrobeRepository {
         emit(listUserWardrobeWithClothes.map { it.userWardrobe })
     }
 
-    override fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes> = flow {
-        listUserWardrobeWithClothes.find { it.userWardrobe.id == id }?.let {
-            emit(it)
-        }
+    override fun getWardrobeWithClothesById(id: Int): Flow<UserWardrobeWithClothes?> = flow {
+        emit(listUserWardrobeWithClothes.find { it.userWardrobe.id == id })
     }
 
     override suspend fun addWardrobeWithClothes(userWardrobeWithClothes: UserWardrobeWithClothes) {
