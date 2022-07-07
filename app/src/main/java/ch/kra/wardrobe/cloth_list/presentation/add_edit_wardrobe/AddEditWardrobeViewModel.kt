@@ -10,6 +10,7 @@ import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.use_case.*
+import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import ch.kra.wardrobe.core.DispatcherProvider
 import ch.kra.wardrobe.core.UIEvent
@@ -90,7 +91,7 @@ class AddEditWardrobeViewModel @Inject constructor(
 
             is AddEditWardrobeEvents.TypeChanged -> {
                 _currentClothe.value = currentClothe.value.copy(
-                    type = event.type
+                    type = event.clotheType
                 )
             }
 
@@ -213,7 +214,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                             id = clothe.id,
                             clothe = clothe.clothe,
                             quantity = clothe.quantity,
-                            type = clothe.typeId
+                            type = ClotheType.BLOOMERS /* TODO to update */
                         )
                     }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
                 )
@@ -267,7 +268,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                             id = it.id,
                             clothe = it.clothe,
                             quantity = it.quantity ?: 0,
-                            typeId = it.type
+                            typeId = 1 /* TODO to update */
                         )
                     }
                 )
@@ -291,7 +292,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                             id = it.id,
                             clothe = it.clothe,
                             quantity = it.quantity ?: 0,
-                            typeId = it.type
+                            typeId = 1 /* TODO to update */
                         )
                     }
                 )

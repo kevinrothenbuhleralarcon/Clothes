@@ -1,5 +1,7 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
 
+import ch.kra.wardrobe.cloth_list.domain.model.Clothe
+import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.UIText
 
 data class WardrobeFormState(
@@ -17,6 +19,6 @@ data class ClotheFormState(
     val clotheError: UIText? = null,
     val quantity: Int? = null,
     val quantityError: UIText? = null,
-    val type: Int = 0,
+    val type: ClotheType = ClotheType.BLOOMERS,
     val update: Boolean = false
 )

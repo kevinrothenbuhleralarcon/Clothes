@@ -12,19 +12,25 @@ import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.positionInRoot
+import androidx.compose.ui.layout.positionInWindow
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +39,7 @@ import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AddEditWardrobe
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AddEditWardrobeViewModel
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AlertDialogSelection
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.ClotheFormState
+import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.UIEvent
 
 @ExperimentalComposeUiApi
@@ -73,14 +80,15 @@ fun AddEditWardrobeScreen(
                     else
                         Text(text = stringResource(R.string.edit_wardrobe))
                 },
-                navigationIcon = {
-                    IconButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.NavigateBackPressed) }) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowBack,
-                            contentDescription = stringResource(
-                                R.string.back
+                navigationIcon = wardrobeFormState.id?.let {
+                     @Composable {
+                        IconButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.DeleteWardrobe) }) {
+                            /*TODO confirm delete*/
+                            Icon(
+                                imageVector = Icons.Default.Close,
+                                contentDescription = stringResource(R.string.delete)
                             )
-                        )
+                        }
                     }
                 },
                 actions = {
@@ -88,6 +96,13 @@ fun AddEditWardrobeScreen(
                         Icon(
                             imageVector = Icons.Default.Add,
                             contentDescription = stringResource(R.string.add_clothe)
+                        )
+                    }
+
+                    IconButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.SaveWardrobe) }) {
+                        Icon(
+                            imageVector = Icons.Default.Check,
+                            contentDescription = stringResource(id = R.string.save)
                         )
                     }
                 }
@@ -173,32 +188,33 @@ fun AddEditWardrobeScreen(
                 }
             }
 
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Button(onClick = { viewModel.onEvent(AddEditWardrobeEvents.SaveWardrobe) }) {
-                    Text(text = stringResource(R.string.save))
-                }
-
-                if (wardrobeFormState.id != null) {
-                    Button(onClick = { viewModel.onEvent(AddEditWardrobeEvents.DeleteWardrobe) }) {
-                        Text(text = stringResource(R.string.delete))
-                    }
-                }
-            }
-
             if (displayBackDialog) {
                 AlertDialog(
                     onDismissRequest = { /*Nothing*/ },
                     title = { Text(text = stringResource(R.string.back_alert_title)) },
                     text = { Text(text = stringResource(R.string.alert_dialog_message)) },
-                    confirmButton = { Button(onClick = { viewModel.onEvent(AddEditWardrobeEvents.OnAlertDialogSelection(AlertDialogSelection.PositiveSelection)) }) {
-                        Text(text = stringResource(R.string.yes))
-                    } },
-                    dismissButton = { Button(onClick = { viewModel.onEvent(AddEditWardrobeEvents.OnAlertDialogSelection(AlertDialogSelection.NegativeSelection)) }) {
-                        Text(text = stringResource(id = R.string.no))
-                    } }
+                    confirmButton = {
+                        Button(onClick = {
+                            viewModel.onEvent(
+                                AddEditWardrobeEvents.OnAlertDialogSelection(
+                                    AlertDialogSelection.PositiveSelection
+                                )
+                            )
+                        }) {
+                            Text(text = stringResource(R.string.yes))
+                        }
+                    },
+                    dismissButton = {
+                        Button(onClick = {
+                            viewModel.onEvent(
+                                AddEditWardrobeEvents.OnAlertDialogSelection(
+                                    AlertDialogSelection.NegativeSelection
+                                )
+                            )
+                        }) {
+                            Text(text = stringResource(id = R.string.no))
+                        }
+                    }
                 )
             }
         }
@@ -212,6 +228,10 @@ private fun ClotheDialog(
     data: ClotheFormState,
     onEvent: (AddEditWardrobeEvents) -> Unit
 ) {
+    val clotheType = mutableListOf<String>()
+    enumValues<ClotheType>().forEach {
+        clotheType.add(stringResource(id = it.resId))
+    }
     if (showDialog) {
         Dialog(
             onDismissRequest = { onEvent(AddEditWardrobeEvents.CancelClothe) },
@@ -264,6 +284,11 @@ private fun ClotheDialog(
                             color = MaterialTheme.colors.error
                         )
                     }
+
+                    ClotheTypeDropDown(
+                        type = data.type,
+                        onItemSelected = { onEvent(AddEditWardrobeEvents.TypeChanged(it)) }
+                    )
 
                     Row(
                         modifier = Modifier.fillMaxWidth(),
