@@ -52,9 +52,9 @@ class UseCasesTest {
                 lastUpdated = Date()
             ),
             listClothe = listOf(
-                Clothe(clothe = "T-Shirt", quantity = 5, typeId = 1),
-                Clothe(clothe = "Jeans", quantity = 2, typeId = 2),
-                Clothe(clothe = "Socks", quantity = 3, typeId = 3)
+                Clothe(clothe = "T-Shirt", quantity = 5, type = 1),
+                Clothe(clothe = "Jeans", quantity = 2, type = 2),
+                Clothe(clothe = "Socks", quantity = 3, type = 3)
             )
         )
         val newWardrobe2 = UserWardrobeWithClothes(
@@ -64,10 +64,10 @@ class UseCasesTest {
                 lastUpdated = Date()
             ),
             listClothe = listOf(
-                Clothe(clothe = "T-Shirt", quantity = 10, typeId = 1),
-                Clothe(clothe = "Jeans", quantity = 6, typeId = 2),
-                Clothe(clothe = "Socks", quantity = 10, typeId = 3),
-                Clothe(clothe = "Pullover", quantity = 3, typeId = 1),
+                Clothe(clothe = "T-Shirt", quantity = 10, type = 1),
+                Clothe(clothe = "Jeans", quantity = 6, type = 2),
+                Clothe(clothe = "Socks", quantity = 10, type = 3),
+                Clothe(clothe = "Pullover", quantity = 3, type = 1),
             )
         )
 

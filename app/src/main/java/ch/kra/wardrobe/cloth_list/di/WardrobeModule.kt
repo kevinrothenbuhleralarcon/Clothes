@@ -24,6 +24,7 @@ object WardrobeModule {
             app,
             WardrobeDatabase::class.java,
             "wardrobe_database")
+            .fallbackToDestructiveMigration()
             .build()
     }
 

@@ -177,6 +177,7 @@ fun AddEditWardrobeScreen(
         }
     }
 
+    // Navigate back alert dialog
     ValidationDialog(
         display = displayBackDialog,
         title = stringResource(R.string.back_alert_title),
@@ -197,6 +198,7 @@ fun AddEditWardrobeScreen(
         }
     )
 
+    // Delete wardrobe alert dialog
     ValidationDialog(
         display = displayDeleteDialog,
         title = stringResource(id = R.string.delete),

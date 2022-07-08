@@ -223,7 +223,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                             id = clothe.id,
                             clothe = clothe.clothe,
                             quantity = clothe.quantity,
-                            type = ClotheType.BLOOMERS /* TODO to update */
+                            type = clothe.type
                         )
                     }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
                 )
@@ -277,7 +277,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                             id = it.id,
                             clothe = it.clothe,
                             quantity = it.quantity ?: 0,
-                            typeId = 1 /* TODO to update */
+                            type = it.type
                         )
                     }
                 )
@@ -301,7 +301,7 @@ class AddEditWardrobeViewModel @Inject constructor(
                             id = it.id,
                             clothe = it.clothe,
                             quantity = it.quantity ?: 0,
-                            typeId = 1 /* TODO to update */
+                            type = it.type
                         )
                     }
                 )

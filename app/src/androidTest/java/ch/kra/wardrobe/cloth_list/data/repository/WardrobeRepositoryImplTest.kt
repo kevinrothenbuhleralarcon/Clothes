@@ -67,10 +67,10 @@ class WardrobeRepositoryImplTest {
             lastUpdated = Date()
         )
         val newClotheList = listOf(
-            Clothe(clothe = "T-shirt", quantity = 5, typeId = 6),
-            Clothe(clothe = "Jeans", quantity = 2, typeId = 4),
-            Clothe(clothe = "Short", quantity = 3, typeId = 4),
-            Clothe(clothe = "Pullover", quantity = 1, typeId = 7)
+            Clothe(clothe = "T-shirt", quantity = 5, type = 6),
+            Clothe(clothe = "Jeans", quantity = 2, type = 4),
+            Clothe(clothe = "Short", quantity = 3, type = 4),
+            Clothe(clothe = "Pullover", quantity = 1, type = 7)
         )
         val userWardrobeWithClothes = UserWardrobeWithClothes(
             userWardrobe = newUserWardrobe,
@@ -100,7 +100,7 @@ class WardrobeRepositoryImplTest {
         val updateUserList = newUserWardrobe.copy(id = userListAfterInsert[0].id, username = "Kevin", location = "Belmont-sur-Lausanne")
         val updateClotheList = userWithClothesAfterInsert!!.listClothe.toMutableList()
         updateClotheList[0] = updateClotheList[0].copy(quantity = 6)
-        updateClotheList.add(Clothe(clothe = "Socks", quantity = 20, typeId = 8))
+        updateClotheList.add(Clothe(clothe = "Socks", quantity = 20, type = 8))
         updateClotheList.removeAt(2)
         val updateUserWardrobeWithClothes = UserWardrobeWithClothes(
             userWardrobe = updateUserList,

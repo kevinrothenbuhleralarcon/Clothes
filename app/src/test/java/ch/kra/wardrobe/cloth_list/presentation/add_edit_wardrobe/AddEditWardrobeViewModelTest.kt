@@ -86,9 +86,9 @@ class AddEditWardrobeViewModelTest {
                     lastUpdated = Date(5000L)
                 ),
                 listClothe = listOf(
-                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, typeId = 1),
-                    Clothe(id = 2, clothe = "Short", quantity = 3, typeId = 2)
-                ).sortedWith(compareBy<Clothe> { it.typeId }.thenBy { it.clothe })
+                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = 1),
+                    Clothe(id = 2, clothe = "Short", quantity = 3, type = 2)
+                ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
             )
             fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
             val savedStateHandle = SavedStateHandle().apply {
@@ -146,7 +146,7 @@ class AddEditWardrobeViewModelTest {
                     )
                     assertEquals(
                         "The type is not correct",
-                        testUserWardrobeWithClothes.listClothe[i].typeId,
+                        testUserWardrobeWithClothes.listClothe[i].type,
                         viewModel.wardrobeFormState.value.clotheList[i].type
                     )
                 }
@@ -312,9 +312,9 @@ class AddEditWardrobeViewModelTest {
                     lastUpdated = Date(5000L)
                 ),
                 listClothe = listOf(
-                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, typeId = 1),
-                    Clothe(id = 2, clothe = "Short", quantity = 3, typeId = 2)
-                ).sortedWith(compareBy<Clothe> { it.typeId }.thenBy { it.clothe })
+                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = 1),
+                    Clothe(id = 2, clothe = "Short", quantity = 3, type = 2)
+                ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
             )
             fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
             val savedStateHandle = SavedStateHandle().apply {
@@ -335,7 +335,7 @@ class AddEditWardrobeViewModelTest {
             viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(1))
             assertEquals("Clothe is not correct", testUserWardrobeWithClothes.listClothe.last().clothe, viewModel.currentClothe.value.clothe)
             assertEquals("Quantity is not correct", testUserWardrobeWithClothes.listClothe.last().quantity, viewModel.currentClothe.value.quantity)
-            assertEquals("Type is not correct", testUserWardrobeWithClothes.listClothe.last().typeId, viewModel.currentClothe.value.type)
+            assertEquals("Type is not correct", testUserWardrobeWithClothes.listClothe.last().type, viewModel.currentClothe.value.type)
             assertTrue("displayClothe should be true", viewModel.displayClotheForm.value)
 
         }
@@ -411,9 +411,9 @@ class AddEditWardrobeViewModelTest {
                 lastUpdated = Date(5000L)
             ),
             listClothe = listOf(
-                Clothe(id = 1, clothe = "T-shirt", quantity = 10, typeId = 1),
-                Clothe(id = 2, clothe = "Short", quantity = 3, typeId = 2)
-            ).sortedWith(compareBy<Clothe> { it.typeId }.thenBy { it.clothe })
+                Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = 1),
+                Clothe(id = 2, clothe = "Short", quantity = 3, type = 2)
+            ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
         )
         fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
         val savedStateHandle = SavedStateHandle().apply {

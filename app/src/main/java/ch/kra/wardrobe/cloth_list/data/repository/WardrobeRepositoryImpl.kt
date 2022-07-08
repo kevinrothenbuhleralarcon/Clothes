@@ -1,6 +1,5 @@
 package ch.kra.wardrobe.cloth_list.data.repository
 
-import android.util.Log
 import ch.kra.wardrobe.cloth_list.data.local.dao.ClotheDao
 import ch.kra.wardrobe.cloth_list.data.local.dao.UserWardrobeDao
 import ch.kra.wardrobe.cloth_list.data.local.entitiy.ClotheEntity
@@ -36,7 +35,7 @@ class WardrobeRepositoryImpl(
                     clothId = it.id ?: 0,
                     clothe = it.clothe,
                     quantity = it.quantity,
-                    typeId = it.typeId,
+                    type = it.type,
                     userWardrobeId = id
                 )
             }
@@ -58,7 +57,7 @@ class WardrobeRepositoryImpl(
                     clothId = it.id ?: 0,
                     clothe = it.clothe,
                     quantity = it.quantity,
-                    typeId = it.typeId,
+                    type = it.type,
                     userWardrobeId = userId
                 )
             }
