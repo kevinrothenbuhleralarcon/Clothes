@@ -1,4 +1,4 @@
-package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
+package ch.kra.wardrobe.core
 
 sealed class AlertDialogSelection {
     object PositiveSelection: AlertDialogSelection()

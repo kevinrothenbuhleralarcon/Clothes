@@ -1,6 +1,5 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
 
-import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.UIText
 

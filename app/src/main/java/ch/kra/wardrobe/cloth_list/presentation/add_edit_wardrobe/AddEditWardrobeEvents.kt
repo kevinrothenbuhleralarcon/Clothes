@@ -1,5 +1,6 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
 
+import ch.kra.wardrobe.core.AlertDialogSelection
 import ch.kra.wardrobe.core.ClotheType
 
 sealed class AddEditWardrobeEvents {
@@ -14,7 +15,6 @@ sealed class AddEditWardrobeEvents {
     object AddClothe: AddEditWardrobeEvents()
     data class UpdateClothe(val id: Int): AddEditWardrobeEvents()
     object SaveWardrobe: AddEditWardrobeEvents()
-    object DeleteWardrobe: AddEditWardrobeEvents()
-    object NavigateBackPressed: AddEditWardrobeEvents()
-    data class OnAlertDialogSelection(val selection: AlertDialogSelection): AddEditWardrobeEvents()
+    data class DeleteWardrobe(val dialogSelection: AlertDialogSelection? = null): AddEditWardrobeEvents()
+    data class NavigateBackPressed(val dialogSelection: AlertDialogSelection? = null): AddEditWardrobeEvents()
 }

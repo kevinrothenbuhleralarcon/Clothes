@@ -1,14 +1,10 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.screen
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
-import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -17,30 +13,20 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.layout.positionInRoot
-import androidx.compose.ui.layout.positionInWindow
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalFocusManager
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.toSize
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import ch.kra.wardrobe.R
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AddEditWardrobeEvents
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AddEditWardrobeViewModel
-import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.AlertDialogSelection
+import ch.kra.wardrobe.core.AlertDialogSelection
 import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.ClotheFormState
 import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.UIEvent
+import ch.kra.wardrobe.core.shared_composable.ValidationDialog
 
 @ExperimentalComposeUiApi
 @Composable
@@ -53,9 +39,10 @@ fun AddEditWardrobeScreen(
     val currentClotheState = viewModel.currentClothe.value
     val displayClotheForm = viewModel.displayClotheForm.value
     val displayBackDialog = viewModel.displayBackDialog.value
+    val displayDeleteDialog = viewModel.displayDeleteDialog.value
 
     BackHandler {
-        viewModel.onEvent(AddEditWardrobeEvents.NavigateBackPressed)
+        viewModel.onEvent(AddEditWardrobeEvents.NavigateBackPressed())
     }
 
     LaunchedEffect(key1 = true) {
@@ -64,6 +51,7 @@ fun AddEditWardrobeScreen(
                 is UIEvent.PopBackStack -> {
                     popBackStack()
                 }
+
                 else -> {}
             }
         }
@@ -81,9 +69,8 @@ fun AddEditWardrobeScreen(
                         Text(text = stringResource(R.string.edit_wardrobe))
                 },
                 navigationIcon = wardrobeFormState.id?.let {
-                     @Composable {
-                        IconButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.DeleteWardrobe) }) {
-                            /*TODO confirm delete*/
+                    @Composable {
+                        IconButton(onClick = { viewModel.onEvent(AddEditWardrobeEvents.DeleteWardrobe()) }) {
                             Icon(
                                 imageVector = Icons.Default.Close,
                                 contentDescription = stringResource(R.string.delete)
@@ -187,38 +174,48 @@ fun AddEditWardrobeScreen(
                     }
                 }
             }
-
-            if (displayBackDialog) {
-                AlertDialog(
-                    onDismissRequest = { /*Nothing*/ },
-                    title = { Text(text = stringResource(R.string.back_alert_title)) },
-                    text = { Text(text = stringResource(R.string.alert_dialog_message)) },
-                    confirmButton = {
-                        Button(onClick = {
-                            viewModel.onEvent(
-                                AddEditWardrobeEvents.OnAlertDialogSelection(
-                                    AlertDialogSelection.PositiveSelection
-                                )
-                            )
-                        }) {
-                            Text(text = stringResource(R.string.yes))
-                        }
-                    },
-                    dismissButton = {
-                        Button(onClick = {
-                            viewModel.onEvent(
-                                AddEditWardrobeEvents.OnAlertDialogSelection(
-                                    AlertDialogSelection.NegativeSelection
-                                )
-                            )
-                        }) {
-                            Text(text = stringResource(id = R.string.no))
-                        }
-                    }
-                )
-            }
         }
     }
+
+    ValidationDialog(
+        display = displayBackDialog,
+        title = stringResource(R.string.back_alert_title),
+        text = stringResource(R.string.back_alert_dialog_message),
+        onPositiveSelection = {
+            viewModel.onEvent(
+                AddEditWardrobeEvents.NavigateBackPressed(
+                    AlertDialogSelection.PositiveSelection
+                )
+            )
+        },
+        onNegativeSelection = {
+            viewModel.onEvent(
+                AddEditWardrobeEvents.NavigateBackPressed(
+                    AlertDialogSelection.NegativeSelection
+                )
+            )
+        }
+    )
+
+    ValidationDialog(
+        display = displayDeleteDialog,
+        title = stringResource(id = R.string.delete),
+        text = stringResource(id = R.string.delete_alert_dialog_message),
+        onPositiveSelection = {
+            viewModel.onEvent(
+                AddEditWardrobeEvents.DeleteWardrobe(
+                    AlertDialogSelection.PositiveSelection
+                )
+            )
+        },
+        onNegativeSelection = {
+            viewModel.onEvent(
+                AddEditWardrobeEvents.DeleteWardrobe(
+                    AlertDialogSelection.NegativeSelection
+                )
+            )
+        }
+    )
 }
 
 @ExperimentalComposeUiApi

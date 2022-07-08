@@ -1,6 +1,5 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
 
-import android.util.Log
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -10,10 +9,8 @@ import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.use_case.*
-import ch.kra.wardrobe.core.ClotheType
+import ch.kra.wardrobe.core.*
 import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
-import ch.kra.wardrobe.core.DispatcherProvider
-import ch.kra.wardrobe.core.UIEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.flowOn
@@ -52,6 +49,9 @@ class AddEditWardrobeViewModel @Inject constructor(
 
     private val _displayBackDialog = mutableStateOf(false)
     val displayBackDialog: State<Boolean> = _displayBackDialog
+
+    private val _displayDeleteDialog = mutableStateOf(false)
+    val displayDeleteDialog: State<Boolean> = _displayDeleteDialog
 
     private var hasUnsavedChanged = false
 
@@ -169,27 +169,36 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.DeleteWardrobe -> {
-                deleteWardrobe()
+                _displayDeleteDialog.value = false
+                when (event.dialogSelection) {
+                    is AlertDialogSelection.PositiveSelection -> {
+                        deleteWardrobe()
+                    }
+
+                    is AlertDialogSelection.NegativeSelection -> {}
+
+                    else -> {
+                        _displayDeleteDialog.value = true
+                    }
+                }
             }
 
             is AddEditWardrobeEvents.NavigateBackPressed -> {
-                if (hasUnsavedChanged) {
-                    _displayBackDialog.value = true
-                }
-                else {
-                    sendUiEvent(UIEvent.PopBackStack)
-                }
-            }
-
-            is AddEditWardrobeEvents.OnAlertDialogSelection -> {
                 _displayBackDialog.value = false
-                when (event.selection) {
+                when (event.dialogSelection) {
                     is AlertDialogSelection.PositiveSelection -> {
                         sendUiEvent(UIEvent.PopBackStack)
                     }
 
-                    is AlertDialogSelection.NegativeSelection -> {
+                    is AlertDialogSelection.NegativeSelection -> { /*Nothing*/ }
 
+                    else -> {
+                        if (hasUnsavedChanged) {
+                            _displayBackDialog.value = true
+                        }
+                        else {
+                            sendUiEvent(UIEvent.PopBackStack)
+                        }
                     }
                 }
             }

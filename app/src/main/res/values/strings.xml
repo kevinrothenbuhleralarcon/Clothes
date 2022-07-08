@@ -19,9 +19,10 @@
     <string name="save">Save</string>
     <string name="delete">Delete</string>
     <string name="back_alert_title">Wardrobe not saved</string>
+    <string name="back_alert_dialog_message">Modification will be lost.\nDo you wish to continue?</string>
+    <string name="delete_alert_dialog_message">Current wardrobe will be deleted.\nDo you wish to continue?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
-    <string name="alert_dialog_message">Modification will be lost, do you wish to continue?</string>
 
     <string name="bloomers">Bloomers</string>
     <string name="blouse">Blouse</string>
