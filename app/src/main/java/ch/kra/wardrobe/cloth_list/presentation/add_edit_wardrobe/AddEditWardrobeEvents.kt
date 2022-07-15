@@ -13,7 +13,7 @@ sealed class AddEditWardrobeEvents {
     object DeleteClothe: AddEditWardrobeEvents()
     object CancelClothe: AddEditWardrobeEvents()
     object AddClothe: AddEditWardrobeEvents()
-    data class UpdateClothe(val id: Int): AddEditWardrobeEvents()
+    data class UpdateClothe(val type: ClotheType, val id: Int): AddEditWardrobeEvents()
     object SaveWardrobe: AddEditWardrobeEvents()
     data class DeleteWardrobe(val dialogSelection: AlertDialogSelection? = null): AddEditWardrobeEvents()
     data class NavigateBackPressed(val dialogSelection: AlertDialogSelection? = null): AddEditWardrobeEvents()

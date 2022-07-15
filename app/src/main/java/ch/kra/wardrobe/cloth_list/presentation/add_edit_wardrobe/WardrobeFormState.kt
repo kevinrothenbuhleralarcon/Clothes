@@ -1,5 +1,6 @@
 package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe
 
+import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.UIText
 
@@ -9,7 +10,13 @@ data class WardrobeFormState(
     val usernameError: UIText? = null,
     val location: String = "",
     val locationError: UIText? = null,
-    val clotheList: List<ClotheFormState> = emptyList()
+
+    val clothesByType: Map<ClotheType, ClotheListState> = emptyMap(),
+
+    val currentClothe: ClotheFormState = ClotheFormState(),
+
+    val displayBackDialog: Boolean = false,
+    val displayDeleteDialog: Boolean = false
 )
 
 data class ClotheFormState(
@@ -19,5 +26,11 @@ data class ClotheFormState(
     val quantity: Int? = null,
     val quantityError: UIText? = null,
     val type: ClotheType = ClotheType.UPPER_BODY,
-    val update: Boolean = false
+    val originalType: ClotheType? = null,
+    val displayClotheForm: Boolean = false,
+)
+
+data class ClotheListState(
+    val isExpanded: Boolean = false,
+    val clotheList: List<Clothe>
 )

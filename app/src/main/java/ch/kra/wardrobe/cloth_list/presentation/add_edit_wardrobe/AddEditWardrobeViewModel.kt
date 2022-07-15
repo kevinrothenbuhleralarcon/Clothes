@@ -38,20 +38,10 @@ class AddEditWardrobeViewModel @Inject constructor(
     private val _wardrobeFormState = mutableStateOf(WardrobeFormState())
     val wardrobeFormState: State<WardrobeFormState> = _wardrobeFormState
 
-    private val _currentClothe = mutableStateOf(ClotheFormState())
-    val currentClothe: State<ClotheFormState> = _currentClothe
-
-    private val _displayClotheForm = mutableStateOf(false)
-    val displayClotheForm: State<Boolean> = _displayClotheForm
+    //private var clotheList: MutableList<Clothe> = mutableListOf()
 
     private val _uiEvent = Channel<UIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
-
-    private val _displayBackDialog = mutableStateOf(false)
-    val displayBackDialog: State<Boolean> = _displayBackDialog
-
-    private val _displayDeleteDialog = mutableStateOf(false)
-    val displayDeleteDialog: State<Boolean> = _displayDeleteDialog
 
     private var hasUnsavedChanged = false
 
@@ -78,41 +68,63 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.ClotheChanged -> {
-                _currentClothe.value = currentClothe.value.copy(
-                    clothe = event.clothe
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = wardrobeFormState.value.currentClothe.copy(
+                        clothe = event.clothe
+                    )
                 )
             }
 
             is AddEditWardrobeEvents.QuantityChanged -> {
-                _currentClothe.value = currentClothe.value.copy(
-                    quantity = event.quantity
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = wardrobeFormState.value.currentClothe.copy(
+                        quantity = event.quantity
+                    )
                 )
             }
 
             is AddEditWardrobeEvents.TypeChanged -> {
-                _currentClothe.value = currentClothe.value.copy(
-                    type = event.clotheType
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = wardrobeFormState.value.currentClothe.copy(
+                        type = event.clotheType
+                    )
                 )
             }
 
             is AddEditWardrobeEvents.AddClothe -> {
-                _currentClothe.value = ClotheFormState()
-                _displayClotheForm.value = true
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = ClotheFormState(
+                        displayClotheForm = true
+                    )
+                )
             }
 
             is AddEditWardrobeEvents.UpdateClothe -> {
-                _currentClothe.value = wardrobeFormState.value.clotheList[event.id].copy(update = true)
-                _displayClotheForm.value = true
+                val clothe = wardrobeFormState.value.clothesByType[event.type]?.clotheList?.get(event.id)
+                clothe?.let {
+                    _wardrobeFormState.value = wardrobeFormState.value.copy(
+                        currentClothe = ClotheFormState(
+                            id = it.id,
+                            clothe = it.clothe,
+                            quantity = it.quantity,
+                            type = it.type,
+                            originalType = it.type
+                        )
+                    )
+                }
             }
 
             is AddEditWardrobeEvents.SaveClothe -> {
-                _currentClothe.value = currentClothe.value.copy(
-                    clotheError = null,
-                    quantityError = null
+
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = wardrobeFormState.value.currentClothe.copy(
+                        clotheError = null,
+                        quantityError = null
+                    )
                 )
 
-                val clotheResult = validateClothe(currentClothe.value.clothe)
-                val quantityResult = validateQuantity(currentClothe.value.quantity)
+                val clotheResult = validateClothe(wardrobeFormState.value.currentClothe.clothe)
+                val quantityResult = validateQuantity(wardrobeFormState.value.currentClothe.quantity)
 
                 val hasError = listOf(
                     clotheResult,
@@ -120,14 +132,16 @@ class AddEditWardrobeViewModel @Inject constructor(
                 ).any { !it.successful }
 
                 if (hasError) {
-                    _currentClothe.value = currentClothe.value.copy(
-                        clotheError = clotheResult.errorMessage,
-                        quantityError = quantityResult.errorMessage
+                    _wardrobeFormState.value = wardrobeFormState.value.copy(
+                        currentClothe = wardrobeFormState.value.currentClothe.copy(
+                            clotheError = clotheResult.errorMessage,
+                            quantityError = quantityResult.errorMessage
+                        )
                     )
                     return
                 }
 
-                if (!currentClothe.value.update) {
+                if (wardrobeFormState.value.currentClothe.originalType == null) {
                     _wardrobeFormState.value = wardrobeFormState.value.copy(
                         clotheList = wardrobeFormState.value.clotheList
                             .plus(currentClothe.value)
@@ -218,17 +232,11 @@ class AddEditWardrobeViewModel @Inject constructor(
                     id = wardrobe.userWardrobe.id,
                     username = wardrobe.userWardrobe.username,
                     location = wardrobe.userWardrobe.location,
-                    clotheList = wardrobe.listClothe.map { clothe ->
-                        ClotheFormState(
-                            id = clothe.id,
-                            clothe = clothe.clothe,
-                            quantity = clothe.quantity,
-                            type = clothe.type
-                        )
-                    }.sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
+                    clothesByType = wardrobe.listClothe
+                        .groupBy { it.type }
+                        .mapValues { ClotheListState(clotheList = it.value) }
                 )
             }
-
         }
             .flowOn(dispatcher.io)
             .launchIn(viewModelScope)
@@ -272,13 +280,8 @@ class AddEditWardrobeViewModel @Inject constructor(
                         location = wardrobeFormState.value.location,
                         lastUpdated = Date()
                     ),
-                    listClothe = wardrobeFormState.value.clotheList.map {
-                        Clothe(
-                            id = it.id,
-                            clothe = it.clothe,
-                            quantity = it.quantity ?: 0,
-                            type = it.type
-                        )
+                    listClothe = wardrobeFormState.value.clothesByType.flatMap {
+                        it.value.clotheList
                     }
                 )
             )
@@ -296,13 +299,8 @@ class AddEditWardrobeViewModel @Inject constructor(
                         location = wardrobeFormState.value.location,
                         lastUpdated = Date()
                     ),
-                    listClothe = wardrobeFormState.value.clotheList.map {
-                        Clothe(
-                            id = it.id,
-                            clothe = it.clothe,
-                            quantity = it.quantity ?: 0,
-                            type = it.type
-                        )
+                    listClothe = wardrobeFormState.value.clothesByType.flatMap {
+                        it.value.clotheList
                     }
                 )
             )

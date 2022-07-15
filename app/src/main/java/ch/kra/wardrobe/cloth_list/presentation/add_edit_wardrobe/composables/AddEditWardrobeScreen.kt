@@ -113,6 +113,7 @@ fun AddEditWardrobeScreen(
                             data = currentClotheState,
                             onEvent = { viewModel.onEvent(it) })
 
+                        /* USERNAME */
                         OutlinedTextField(
                             value = wardrobeFormState.username,
                             onValueChange = {
@@ -134,6 +135,7 @@ fun AddEditWardrobeScreen(
                             )
                         }
 
+                        /* LOCATION */
                         OutlinedTextField(
                             value = wardrobeFormState.location,
                             onValueChange = {
@@ -165,12 +167,40 @@ fun AddEditWardrobeScreen(
                     }
                 }
 
+                /* CLOTHES */
+                var previousClotheType: ClotheType? = null
+                var startIndex = 0
+                var endIndex: Int
                 items(wardrobeFormState.clotheList.size) { id ->
-                    Row(modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(id)) }) {
-                        Text(text = wardrobeFormState.clotheList[id].clothe)
-                        Text(text = wardrobeFormState.clotheList[id].quantity.toString())
+                    if (id == 0) {
+                        previousClotheType = wardrobeFormState.clotheList[id].type
+                    }
+                    if (previousClotheType != wardrobeFormState.clotheList[id].type) {
+                        endIndex = id - 1
+                        ClotheTypeExpendable(
+                            type = stringResource(id = previousClotheType!!.resId),
+                            contentList = wardrobeFormState.clotheList,
+                            startIndex = startIndex,
+                            endIndex = endIndex,
+                            onContentClick = { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(it)) }
+                        )
+
+                        startIndex = id
+                        previousClotheType = wardrobeFormState.clotheList[id].type
+                    }
+
+                    if (id == wardrobeFormState.clotheList.size - 1) {
+                        endIndex = id
+                        ClotheTypeExpendable(
+                            type = stringResource(id = previousClotheType!!.resId),
+                            contentList = wardrobeFormState.clotheList,
+                            startIndex = startIndex,
+                            endIndex = endIndex,
+                            onContentClick = { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(it)) }
+                        )
+
+                        startIndex = id
+                        previousClotheType = wardrobeFormState.clotheList[id].type
                     }
                 }
             }
