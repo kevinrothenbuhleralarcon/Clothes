@@ -5,6 +5,7 @@ import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.repository.WardrobeRepository
+import ch.kra.wardrobe.core.ClotheType
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
@@ -67,10 +68,10 @@ class WardrobeRepositoryImplTest {
             lastUpdated = Date()
         )
         val newClotheList = listOf(
-            Clothe(clothe = "T-shirt", quantity = 5, type = 6),
-            Clothe(clothe = "Jeans", quantity = 2, type = 4),
-            Clothe(clothe = "Short", quantity = 3, type = 4),
-            Clothe(clothe = "Pullover", quantity = 1, type = 7)
+            Clothe(clothe = "T-shirt", quantity = 5, type = ClotheType.UPPER_BODY),
+            Clothe(clothe = "Jeans", quantity = 2, type = ClotheType.LEG),
+            Clothe(clothe = "Short", quantity = 3, type = ClotheType.LEG),
+            Clothe(clothe = "Pullover", quantity = 1, type = ClotheType.UPPER_BODY)
         )
         val userWardrobeWithClothes = UserWardrobeWithClothes(
             userWardrobe = newUserWardrobe,
@@ -100,7 +101,7 @@ class WardrobeRepositoryImplTest {
         val updateUserList = newUserWardrobe.copy(id = userListAfterInsert[0].id, username = "Kevin", location = "Belmont-sur-Lausanne")
         val updateClotheList = userWithClothesAfterInsert!!.listClothe.toMutableList()
         updateClotheList[0] = updateClotheList[0].copy(quantity = 6)
-        updateClotheList.add(Clothe(clothe = "Socks", quantity = 20, type = 8))
+        updateClotheList.add(Clothe(clothe = "Socks", quantity = 20, type = ClotheType.SOCK))
         updateClotheList.removeAt(2)
         val updateUserWardrobeWithClothes = UserWardrobeWithClothes(
             userWardrobe = updateUserList,

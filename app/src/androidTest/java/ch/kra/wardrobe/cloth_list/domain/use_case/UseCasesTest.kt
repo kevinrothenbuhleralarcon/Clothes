@@ -4,6 +4,7 @@ import ch.kra.wardrobe.cloth_list.di.WardrobeModule
 import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
+import ch.kra.wardrobe.core.ClotheType
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
 import dagger.hilt.android.testing.UninstallModules
@@ -52,9 +53,9 @@ class UseCasesTest {
                 lastUpdated = Date()
             ),
             listClothe = listOf(
-                Clothe(clothe = "T-Shirt", quantity = 5, type = 1),
-                Clothe(clothe = "Jeans", quantity = 2, type = 2),
-                Clothe(clothe = "Socks", quantity = 3, type = 3)
+                Clothe(clothe = "T-Shirt", quantity = 5, type = ClotheType.UPPER_BODY),
+                Clothe(clothe = "Jeans", quantity = 2, type = ClotheType.LEG),
+                Clothe(clothe = "Socks", quantity = 3, type = ClotheType.SOCK)
             )
         )
         val newWardrobe2 = UserWardrobeWithClothes(
@@ -64,10 +65,10 @@ class UseCasesTest {
                 lastUpdated = Date()
             ),
             listClothe = listOf(
-                Clothe(clothe = "T-Shirt", quantity = 10, type = 1),
-                Clothe(clothe = "Jeans", quantity = 6, type = 2),
-                Clothe(clothe = "Socks", quantity = 10, type = 3),
-                Clothe(clothe = "Pullover", quantity = 3, type = 1),
+                Clothe(clothe = "T-Shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                Clothe(clothe = "Jeans", quantity = 6, type = ClotheType.LEG),
+                Clothe(clothe = "Socks", quantity = 10, type = ClotheType.SOCK),
+                Clothe(clothe = "Pullover", quantity = 3, type = ClotheType.UPPER_BODY),
             )
         )
 

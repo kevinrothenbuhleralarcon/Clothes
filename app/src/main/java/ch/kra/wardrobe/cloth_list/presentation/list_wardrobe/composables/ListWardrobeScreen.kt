@@ -1,4 +1,4 @@
-package ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.screen
+package ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.composables
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -21,7 +21,6 @@ import ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.ListWardrobeEvents
 import ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.ListWardrobeViewModel
 import ch.kra.wardrobe.core.UIEvent
 import java.text.SimpleDateFormat
-import java.util.*
 
 @Composable
 fun ListWardrobeScreen(

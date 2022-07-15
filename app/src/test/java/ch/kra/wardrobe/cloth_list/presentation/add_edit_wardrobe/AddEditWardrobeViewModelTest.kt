@@ -8,6 +8,7 @@ import ch.kra.wardrobe.cloth_list.domain.model.Clothe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobe
 import ch.kra.wardrobe.cloth_list.domain.model.UserWardrobeWithClothes
 import ch.kra.wardrobe.cloth_list.domain.use_case.*
+import ch.kra.wardrobe.core.ClotheType
 import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -86,8 +87,8 @@ class AddEditWardrobeViewModelTest {
                     lastUpdated = Date(5000L)
                 ),
                 listClothe = listOf(
-                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = 1),
-                    Clothe(id = 2, clothe = "Short", quantity = 3, type = 2)
+                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                    Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
                 ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
             )
             fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
@@ -259,13 +260,13 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertEquals("Type is not 0", 0, viewModel.currentClothe.value.type)
+        assertEquals("Type is not upper body", ClotheType.UPPER_BODY, viewModel.currentClothe.value.type)
 
-        val newType = 10
+        val newType = ClotheType.LEG
         viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(newType))
         assertEquals("Type is not changed", newType, viewModel.currentClothe.value.type)
 
-        val updateType = 50
+        val updateType = ClotheType.UNDERWEAR
         viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(updateType))
         assertEquals("Type is not changed", updateType, viewModel.currentClothe.value.type)
     }
@@ -281,7 +282,7 @@ class AddEditWardrobeViewModelTest {
             advanceUntilIdle()
             val clothe = "test"
             val quantity = 10
-            val type = 2
+            val type = ClotheType.JEWEL
             viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(clothe))
             viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(quantity))
             viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(type))
@@ -312,8 +313,8 @@ class AddEditWardrobeViewModelTest {
                     lastUpdated = Date(5000L)
                 ),
                 listClothe = listOf(
-                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = 1),
-                    Clothe(id = 2, clothe = "Short", quantity = 3, type = 2)
+                    Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                    Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
                 ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
             )
             fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
@@ -411,8 +412,8 @@ class AddEditWardrobeViewModelTest {
                 lastUpdated = Date(5000L)
             ),
             listClothe = listOf(
-                Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = 1),
-                Clothe(id = 2, clothe = "Short", quantity = 3, type = 2)
+                Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
             ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
         )
         fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
@@ -434,7 +435,7 @@ class AddEditWardrobeViewModelTest {
 
         val newClothe = "test"
         val newQuantity = 6
-        val newType = 8
+        val newType = ClotheType.SCARF
 
         viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(1))
         viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(newClothe))
@@ -459,7 +460,7 @@ class AddEditWardrobeViewModelTest {
         val location = "test location"
         val clothe1 = "T-shirt"
         val quantity1 = 10
-        val type1 = 1
+        val type1 = ClotheType.UPPER_BODY
         viewModel.onEvent(AddEditWardrobeEvents.UsernameChanged(username))
         viewModel.onEvent(AddEditWardrobeEvents.LocationChanged(location))
         viewModel.onEvent(AddEditWardrobeEvents.AddClothe)

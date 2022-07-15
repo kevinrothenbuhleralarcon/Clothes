@@ -4,7 +4,21 @@ import androidx.annotation.StringRes
 import ch.kra.wardrobe.R
 
 enum class ClotheType(@StringRes val resId: Int) {
-    BLOOMERS(R.string.bloomers),
+
+    /* RPG STYlE */
+    UPPER_BODY(R.string.upper_body),
+    LEG(R.string.leg),
+    UNDERWEAR(R.string.underwear),
+    SOCK(R.string.sock),
+    SHOE(R.string.shoe),
+    HEADGEAR(R.string.headgear),
+    GLOVE(R.string.glove),
+    JEWEL(R.string.jewel),
+    BELT(R.string.belt),
+    SCARF(R.string.scarf)
+
+    /* FULL LIST */
+    /*BLOOMERS(R.string.bloomers),
     BLOUSE(R.string.blouse),
     BODYSUIT(R.string.bodysuit),
     BRA(R.string.bra),
@@ -47,5 +61,5 @@ enum class ClotheType(@StringRes val resId: Int) {
     TOPS(R.string.tops),
     TRACKSUIT(R.string.tracksuit),
     T_SHIRT(R.string.tShirt),
-    WAISTCOAT(R.string.waistcoat),
+    WAISTCOAT(R.string.waistcoat),*/
 }

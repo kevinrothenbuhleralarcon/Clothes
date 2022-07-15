@@ -7,8 +7,8 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
-import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.screen.AddEditWardrobeScreen
-import ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.screen.ListWardrobeScreen
+import ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.composables.AddEditWardrobeScreen
+import ch.kra.wardrobe.cloth_list.presentation.list_wardrobe.composables.ListWardrobeScreen
 import ch.kra.wardrobe.core.Constants.NAVIGATION_WARDROBE_ID
 import ch.kra.wardrobe.core.Routes
 

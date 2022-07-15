@@ -1,4 +1,4 @@
-package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.screen
+package ch.kra.wardrobe.cloth_list.presentation.add_edit_wardrobe.composables
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box

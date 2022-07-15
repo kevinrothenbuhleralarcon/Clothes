@@ -23,7 +23,22 @@
     <string name="delete_alert_dialog_message">Current wardrobe will be deleted.\nDo you wish to continue?</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
+    <string name="toggle_expansion">Toggle type expansion</string>
 
+    <!-- RPG Style -->
+    <string name="headgear">Headgear</string>
+    <string name="upper_body">Upper body</string>
+    <string name="leg">Leg</string>
+    <string name="shoe">Shoe</string>
+    <string name="underwear">underwear</string>
+    <string name="sock">Sock</string>
+    <string name="glove">Glove</string>
+    <string name="jewel">jewel</string>
+    <string name="belt">Belt</string>
+    <string name="scarf">Scarf</string>
+
+    <!-- Full list -->
+    <!--
     <string name="bloomers">Bloomers</string>
     <string name="blouse">Blouse</string>
     <string name="bodysuit">Bodysuit</string>
@@ -68,4 +83,5 @@
     <string name="tracksuit">Tracksuit</string>
     <string name="tShirt">T-Shirt</string>
     <string name="waistcoat">Waistcoat</string>
+    -->
 </resources>
