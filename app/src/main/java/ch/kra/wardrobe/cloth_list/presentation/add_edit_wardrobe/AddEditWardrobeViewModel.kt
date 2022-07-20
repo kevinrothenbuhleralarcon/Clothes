@@ -157,6 +157,8 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.DeleteClothe -> {
+                /* TODO remove the key if the clothList is empty */
+
                 wardrobeFormState.value.apply {
                     this.currentClothe.originalListIndex?.let { index ->
                         _wardrobeFormState.value = this.copy(
