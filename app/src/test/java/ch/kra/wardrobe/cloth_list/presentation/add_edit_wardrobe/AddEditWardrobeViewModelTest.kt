@@ -72,7 +72,7 @@ class AddEditWardrobeViewModelTest {
         assertEquals(
             "Clothe list does not have the default value",
             0,
-            wardrobeFormState.clotheList.size
+            wardrobeFormState.clothesByType.size
         )
     }
 
@@ -89,7 +89,7 @@ class AddEditWardrobeViewModelTest {
                 listClothe = listOf(
                     Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
                     Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
-                ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
+                )
             )
             fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
             val savedStateHandle = SavedStateHandle().apply {
@@ -120,39 +120,39 @@ class AddEditWardrobeViewModelTest {
                 "Location error does not have the default value",
                 viewModel.wardrobeFormState.value.locationError
             )
-            if (viewModel.wardrobeFormState.value.clotheList.size == testUserWardrobeWithClothes.listClothe.size) {
+            val vmNbClothes =
+                viewModel.wardrobeFormState.value.clothesByType.flatMap { it.value.clotheList }.size
+            if (vmNbClothes == testUserWardrobeWithClothes.listClothe.size) {
                 for (i in 0 until testUserWardrobeWithClothes.listClothe.size) {
-                    assertEquals(
-                        "Clothe id is not correct",
-                        testUserWardrobeWithClothes.listClothe[i].id,
-                        viewModel.wardrobeFormState.value.clotheList[i].id
-                    )
-                    assertEquals(
-                        "Clothe name is not correct",
-                        testUserWardrobeWithClothes.listClothe[i].clothe,
-                        viewModel.wardrobeFormState.value.clotheList[i].clothe
-                    )
-                    assertNull(
-                        "Clothe name error is not the default value",
-                        viewModel.wardrobeFormState.value.clotheList[i].clotheError
-                    )
-                    assertEquals(
-                        "Quantity is not correct",
-                        testUserWardrobeWithClothes.listClothe[i].quantity,
-                        viewModel.wardrobeFormState.value.clotheList[i].quantity
-                    )
-                    assertNull(
-                        "Quantity error is not have the default value",
-                        viewModel.wardrobeFormState.value.clotheList[i].quantityError
-                    )
-                    assertEquals(
-                        "The type is not correct",
-                        testUserWardrobeWithClothes.listClothe[i].type,
-                        viewModel.wardrobeFormState.value.clotheList[i].type
-                    )
+                    val clothe = testUserWardrobeWithClothes.listClothe[i]
+                    val vmClothe =
+                        viewModel.wardrobeFormState.value.clothesByType[clothe.type]?.clotheList?.find { it == clothe }
+                    vmClothe?.let {
+                        assertEquals(
+                            "Clothe id is not correct",
+                            clothe.id,
+                            it.id
+                        )
+                        assertEquals(
+                            "Clothe name is not correct",
+                            clothe.clothe,
+                            it.clothe
+                        )
+                        assertEquals(
+                            "Quantity is not correct",
+                            clothe.quantity,
+                            it.quantity
+                        )
+                        assertEquals(
+                            "The type is not correct",
+                            clothe.type,
+                            it.type
+                        )
+                    } ?: fail("Clothe not found in the viewModel")
+
                 }
             } else {
-                fail("Clothe list does not have the correct size, Expected:<${testUserWardrobeWithClothes.listClothe.size}>, but was<${viewModel.wardrobeFormState.value.clotheList.size}>")
+                fail("Clothe list does not have the correct size, Expected:<${testUserWardrobeWithClothes.listClothe.size}>, but was<$vmNbClothes>")
             }
         }
 
@@ -218,15 +218,27 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertEquals("Clothe is not empty", "", viewModel.currentClothe.value.clothe)
+        assertEquals(
+            "Clothe is not empty",
+            "",
+            viewModel.wardrobeFormState.value.currentClothe.clothe
+        )
 
         val newClothe = "test"
         viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(newClothe))
-        assertEquals("Clothe is not changed", newClothe, viewModel.currentClothe.value.clothe)
+        assertEquals(
+            "Clothe is not changed",
+            newClothe,
+            viewModel.wardrobeFormState.value.currentClothe.clothe
+        )
 
         val updateClothe = "test2"
         viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(updateClothe))
-        assertEquals("Clothe is not changed", updateClothe, viewModel.currentClothe.value.clothe)
+        assertEquals(
+            "Clothe is not changed",
+            updateClothe,
+            viewModel.wardrobeFormState.value.currentClothe.clothe
+        )
     }
 
     @Test
@@ -237,18 +249,18 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertNull("quantity is not null", viewModel.currentClothe.value.quantity)
+        assertNull("quantity is not null", viewModel.wardrobeFormState.value.currentClothe.quantity)
 
         val newQuantity = 10
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(newQuantity))
-        assertEquals("Quantity is not changed", newQuantity, viewModel.currentClothe.value.quantity)
+        assertEquals("Quantity is not changed", newQuantity, viewModel.wardrobeFormState.value.currentClothe.quantity)
 
         val updateQuantity = 50
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(updateQuantity))
         assertEquals(
             "Quantity is not changed",
             updateQuantity,
-            viewModel.currentClothe.value.quantity
+            viewModel.wardrobeFormState.value.currentClothe.quantity
         )
     }
 
@@ -260,15 +272,27 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertEquals("Type is not upper body", ClotheType.UPPER_BODY, viewModel.currentClothe.value.type)
+        assertEquals(
+            "Type is not upper body",
+            ClotheType.UPPER_BODY,
+            viewModel.wardrobeFormState.value.currentClothe.type
+        )
 
         val newType = ClotheType.LEG
         viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(newType))
-        assertEquals("Type is not changed", newType, viewModel.currentClothe.value.type)
+        assertEquals(
+            "Type is not changed",
+            newType,
+            viewModel.wardrobeFormState.value.currentClothe.type
+        )
 
         val updateType = ClotheType.UNDERWEAR
         viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(updateType))
-        assertEquals("Type is not changed", updateType, viewModel.currentClothe.value.type)
+        assertEquals(
+            "Type is not changed",
+            updateType,
+            viewModel.wardrobeFormState.value.currentClothe.type
+        )
     }
 
     @Test
@@ -286,20 +310,20 @@ class AddEditWardrobeViewModelTest {
             viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(clothe))
             viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(quantity))
             viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(type))
-            assertEquals("Clothe is not correct", clothe, viewModel.currentClothe.value.clothe)
+            assertEquals("Clothe is not correct", clothe, viewModel.wardrobeFormState.value.currentClothe.clothe)
             assertEquals(
                 "Quantity is not correct",
                 quantity,
-                viewModel.currentClothe.value.quantity
+                viewModel.wardrobeFormState.value.currentClothe.quantity
             )
-            assertEquals("Type is not correct", type, viewModel.currentClothe.value.type)
-            assertFalse("displayClothe should be false", viewModel.displayClotheForm.value)
+            assertEquals("Type is not correct", type, viewModel.wardrobeFormState.value.currentClothe.type)
+            assertFalse("displayClothe should be false", viewModel.wardrobeFormState.value.currentClothe.displayClotheForm)
 
             viewModel.onEvent(AddEditWardrobeEvents.AddClothe)
-            assertEquals("Clothe is not correct", "", viewModel.currentClothe.value.clothe)
-            assertNull("Quantity is not correct", viewModel.currentClothe.value.quantity)
-            assertEquals("Type is not correct", 0, viewModel.currentClothe.value.type)
-            assertTrue("displayClothe should be true", viewModel.displayClotheForm.value)
+            assertEquals("Clothe is not correct", "", viewModel.wardrobeFormState.value.currentClothe.clothe)
+            assertNull("Quantity is not correct", viewModel.wardrobeFormState.value.currentClothe.quantity)
+            assertEquals("Type is not correct", ClotheType.UPPER_BODY, viewModel.wardrobeFormState.value.currentClothe.type)
+            assertTrue("displayClothe should be true", viewModel.wardrobeFormState.value.currentClothe.displayClotheForm)
         }
 
     @Test
@@ -315,7 +339,7 @@ class AddEditWardrobeViewModelTest {
                 listClothe = listOf(
                     Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
                     Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
-                ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
+                )
             )
             fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
             val savedStateHandle = SavedStateHandle().apply {
@@ -326,18 +350,18 @@ class AddEditWardrobeViewModelTest {
             assertEquals(
                 "The second cloth is not correct",
                 testUserWardrobeWithClothes.listClothe.last().clothe,
-                viewModel.wardrobeFormState.value.clotheList.last().clothe
+                viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.get(0)?.clothe
             )
-            assertEquals("Clothe is not correct", "", viewModel.currentClothe.value.clothe)
-            assertNull("Quantity is not correct", viewModel.currentClothe.value.quantity)
-            assertEquals("Type is not correct", 0, viewModel.currentClothe.value.type)
-            assertFalse("displayClothe should be false", viewModel.displayClotheForm.value)
+            assertEquals("Clothe is not correct", "", viewModel.wardrobeFormState.value.currentClothe.clothe)
+            assertNull("Quantity is not correct", viewModel.wardrobeFormState.value.currentClothe.quantity)
+            assertEquals("Type is not correct", ClotheType.UPPER_BODY, viewModel.wardrobeFormState.value.currentClothe.type)
+            assertFalse("displayClothe should be false", viewModel.wardrobeFormState.value.currentClothe.displayClotheForm)
 
-            viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(1))
-            assertEquals("Clothe is not correct", testUserWardrobeWithClothes.listClothe.last().clothe, viewModel.currentClothe.value.clothe)
-            assertEquals("Quantity is not correct", testUserWardrobeWithClothes.listClothe.last().quantity, viewModel.currentClothe.value.quantity)
-            assertEquals("Type is not correct", testUserWardrobeWithClothes.listClothe.last().type, viewModel.currentClothe.value.type)
-            assertTrue("displayClothe should be true", viewModel.displayClotheForm.value)
+            viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(ClotheType.LEG, 0))
+            assertEquals("Clothe is not correct", testUserWardrobeWithClothes.listClothe.last().clothe, viewModel.wardrobeFormState.value.currentClothe.clothe)
+            assertEquals("Quantity is not correct", testUserWardrobeWithClothes.listClothe.last().quantity, viewModel.wardrobeFormState.value.currentClothe.quantity)
+            assertEquals("Type is not correct", testUserWardrobeWithClothes.listClothe.last().type, viewModel.wardrobeFormState.value.currentClothe.type)
+            assertTrue("displayClothe should be true", viewModel.wardrobeFormState.value.currentClothe.displayClotheForm)
 
         }
 
@@ -349,15 +373,15 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertNull("ClotheError is not null", viewModel.currentClothe.value.clotheError)
-        assertNull("QuantityError is not null", viewModel.currentClothe.value.quantityError)
-        assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
+        assertNull("ClotheError is not null", viewModel.wardrobeFormState.value.currentClothe.clotheError)
+        assertNull("QuantityError is not null", viewModel.wardrobeFormState.value.currentClothe.quantityError)
+        assertEquals("ClotheByType is not empty", 0, viewModel.wardrobeFormState.value.clothesByType.size)
 
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(-2))
         viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
-        assertNotNull("ClotheError is null", viewModel.currentClothe.value.clotheError)
-        assertNotNull("QuantityError is null", viewModel.currentClothe.value.quantityError)
-        assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
+        assertNotNull("ClotheError is null", viewModel.wardrobeFormState.value.currentClothe.clotheError)
+        assertNotNull("QuantityError is null", viewModel.wardrobeFormState.value.currentClothe.quantityError)
+        assertEquals("ClotheByType is not empty", 0, viewModel.wardrobeFormState.value.clothesByType.size)
     }
 
     @Test
@@ -368,42 +392,42 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertNull("ClotheError is not null", viewModel.currentClothe.value.clotheError)
-        assertNull("QuantityError is not null", viewModel.currentClothe.value.quantityError)
-        assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
+        assertNull("ClotheError is not null", viewModel.wardrobeFormState.value.currentClothe.clotheError)
+        assertNull("QuantityError is not null", viewModel.wardrobeFormState.value.currentClothe.quantityError)
+        assertEquals("ClotheByType is not empty", 0, viewModel.wardrobeFormState.value.clothesByType.size)
 
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(5))
         viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
-        assertNotNull("ClotheError is null", viewModel.currentClothe.value.clotheError)
-        assertNull("QuantityError is not null", viewModel.currentClothe.value.quantityError)
-        assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
+        assertNotNull("ClotheError is null", viewModel.wardrobeFormState.value.currentClothe.clotheError)
+        assertNull("QuantityError is not null", viewModel.wardrobeFormState.value.currentClothe.quantityError)
+        assertEquals("ClotheByType is not empty", 0, viewModel.wardrobeFormState.value.clothesByType.size)
 
         viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged("test"))
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(-2))
         viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
-        assertNull("ClotheError is not null", viewModel.currentClothe.value.clotheError)
-        assertNotNull("QuantityError is null", viewModel.currentClothe.value.quantityError)
-        assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
+        assertNull("ClotheError is not null", viewModel.wardrobeFormState.value.currentClothe.clotheError)
+        assertNotNull("QuantityError is null", viewModel.wardrobeFormState.value.currentClothe.quantityError)
+        assertEquals("ClotheByType is not empty", 0, viewModel.wardrobeFormState.value.clothesByType.size)
     }
 
     @Test
-    fun `onEvent with SaveClothe data are correct and it is a new clothe, the clothe is saved to the list`() = runTest {
+    fun `onEvent with SaveClothe data are correct and it is a new clothe with a not existing type, the clothe is saved to the list`() = runTest {
         val id = -1
         val savedStateHandle = SavedStateHandle().apply {
             set(NAVIGATION_WARDROBE_ID, id)
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
-        assertEquals("ClotheList is not empty", 0, viewModel.wardrobeFormState.value.clotheList.size)
+        assertEquals("ClotheByType is not empty", 0, viewModel.wardrobeFormState.value.clothesByType.size)
 
         viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged("test"))
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(2))
         viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
-        assertEquals("ClotheList is empty", 1, viewModel.wardrobeFormState.value.clotheList.size)
+        assertEquals("ClotheByType is empty", 1, viewModel.wardrobeFormState.value.clothesByType.size)
     }
 
     @Test
-    fun `onEvent with SaveClothe data are correct and it is an update of a clothe, the clothe is correctly updated`() = runTest {
+    fun `onEvent with SaveClothe data are correct and it is a new clothe with an existing type, the clothe is saved to the list`() = runTest {
         val testUserWardrobeWithClothes = UserWardrobeWithClothes(
             userWardrobe = UserWardrobe(
                 id = 50,
@@ -414,7 +438,7 @@ class AddEditWardrobeViewModelTest {
             listClothe = listOf(
                 Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
                 Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
-            ).sortedWith(compareBy<Clothe> { it.type }.thenBy { it.clothe })
+            )
         )
         fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
         val savedStateHandle = SavedStateHandle().apply {
@@ -422,29 +446,150 @@ class AddEditWardrobeViewModelTest {
         }
         initViewModel(savedStateHandle)
         advanceUntilIdle()
+        assertEquals("UpperBody is not the correct size", 1, viewModel.wardrobeFormState.value.clothesByType[ClotheType.UPPER_BODY]?.clotheList?.size)
+
+        viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged("test"))
+        viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(2))
+        viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
+        assertEquals("UpperBody is not the correct size", 2, viewModel.wardrobeFormState.value.clothesByType[ClotheType.UPPER_BODY]?.clotheList?.size)
+    }
+
+    @Test
+    fun `onEvent with SaveClothe data are correct and it is an update of a clothe with the same type, the clothe is correctly updated`() = runTest {
+        val testUserWardrobeWithClothes = UserWardrobeWithClothes(
+            userWardrobe = UserWardrobe(
+                id = 50,
+                username = "test username",
+                location = "test location",
+                lastUpdated = Date(5000L)
+            ),
+            listClothe = listOf(
+                Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
+            )
+        )
+        fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
+        val savedStateHandle = SavedStateHandle().apply {
+            set(NAVIGATION_WARDROBE_ID, testUserWardrobeWithClothes.userWardrobe.id)
+        }
+        initViewModel(savedStateHandle)
+        advanceUntilIdle()
+        val vmNbClothes = viewModel.wardrobeFormState.value.clothesByType.flatMap { it.value.clotheList }.size
         assertEquals(
-            "ClotheList is does not have the correct size",
+            "ClotheByType does not have the correct size",
             testUserWardrobeWithClothes.listClothe.size,
-            viewModel.wardrobeFormState.value.clotheList.size
+            vmNbClothes
         )
         assertEquals(
             "The cloth name is not correct",
             testUserWardrobeWithClothes.listClothe[1].clothe,
-            viewModel.wardrobeFormState.value.clotheList[1].clothe
+            viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.get(0)?.clothe
+        )
+
+        val newClothe = "test"
+        val newQuantity = 6
+
+        viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(ClotheType.LEG, 0))
+        viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(newClothe))
+        viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(newQuantity))
+        viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
+        assertEquals("The clothe is not correct", newClothe, viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.get(0)?.clothe)
+        assertEquals("The quantity is not correct", newQuantity, viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.get(0)?.quantity)
+    }
+
+    @Test
+    fun `onEvent with SaveClothe data are correct and it is an update of a clothe with a different type and is the only one in original type type, the clothe is correctly updated`() = runTest {
+        val testUserWardrobeWithClothes = UserWardrobeWithClothes(
+            userWardrobe = UserWardrobe(
+                id = 50,
+                username = "test username",
+                location = "test location",
+                lastUpdated = Date(5000L)
+            ),
+            listClothe = listOf(
+                Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG)
+            )
+        )
+        fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
+        val savedStateHandle = SavedStateHandle().apply {
+            set(NAVIGATION_WARDROBE_ID, testUserWardrobeWithClothes.userWardrobe.id)
+        }
+        initViewModel(savedStateHandle)
+        advanceUntilIdle()
+        val vmNbClothes = viewModel.wardrobeFormState.value.clothesByType.flatMap { it.value.clotheList }.size
+        assertEquals(
+            "ClotheByType does not have the correct size",
+            testUserWardrobeWithClothes.listClothe.size,
+            vmNbClothes
+        )
+        assertEquals(
+            "The cloth name is not correct",
+            testUserWardrobeWithClothes.listClothe[1].clothe,
+            viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.get(0)?.clothe
         )
 
         val newClothe = "test"
         val newQuantity = 6
         val newType = ClotheType.SCARF
 
-        viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(1))
+        viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(ClotheType.LEG, 0))
         viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(newClothe))
         viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(newQuantity))
         viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(newType))
         viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
-        assertEquals("The clothe is not correct", newClothe, viewModel.wardrobeFormState.value.clotheList[1].clothe)
-        assertEquals("The quantity is not correct", newQuantity, viewModel.wardrobeFormState.value.clotheList[1].quantity)
-        assertEquals("The type is not correct", newType, viewModel.wardrobeFormState.value.clotheList[1].type)
+        assertFalse("There should be no type Leg as the only clothe is removed", ClotheType.LEG in viewModel.wardrobeFormState.value.clothesByType)
+        assertEquals("The clothe is not correct", newClothe, viewModel.wardrobeFormState.value.clothesByType[newType]?.clotheList?.get(0)?.clothe)
+        assertEquals("The quantity is not correct", newQuantity, viewModel.wardrobeFormState.value.clothesByType[newType]?.clotheList?.get(0)?.quantity)
+        assertEquals("The type is not correct", newType, viewModel.wardrobeFormState.value.clothesByType[newType]?.clotheList?.get(0)?.type)
+    }
+
+    @Test
+    fun `onEvent with SaveClothe data are correct and it is an update of a clothe with a different type and is not the only one in original type type, the clothe is correctly updated`() = runTest {
+        val testUserWardrobeWithClothes = UserWardrobeWithClothes(
+            userWardrobe = UserWardrobe(
+                id = 50,
+                username = "test username",
+                location = "test location",
+                lastUpdated = Date(5000L)
+            ),
+            listClothe = listOf(
+                Clothe(id = 1, clothe = "T-shirt", quantity = 10, type = ClotheType.UPPER_BODY),
+                Clothe(id = 2, clothe = "Short", quantity = 3, type = ClotheType.LEG),
+                Clothe(id = 3, clothe = "Jeans", quantity = 2, type = ClotheType.LEG)
+            )
+        )
+        fakeRepository.listUserWardrobeWithClothes.add(testUserWardrobeWithClothes)
+        val savedStateHandle = SavedStateHandle().apply {
+            set(NAVIGATION_WARDROBE_ID, testUserWardrobeWithClothes.userWardrobe.id)
+        }
+        initViewModel(savedStateHandle)
+        advanceUntilIdle()
+        val vmNbClothes = viewModel.wardrobeFormState.value.clothesByType.flatMap { it.value.clotheList }.size
+        assertEquals(
+            "ClotheByType does not have the correct size",
+            testUserWardrobeWithClothes.listClothe.size,
+            vmNbClothes
+        )
+        assertEquals(
+            "The cloth name is not correct",
+            testUserWardrobeWithClothes.listClothe[1].clothe,
+            viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.get(0)?.clothe
+        )
+
+        val newClothe = "test"
+        val newQuantity = 6
+        val newType = ClotheType.SCARF
+
+        viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(ClotheType.LEG, 0))
+        viewModel.onEvent(AddEditWardrobeEvents.ClotheChanged(newClothe))
+        viewModel.onEvent(AddEditWardrobeEvents.QuantityChanged(newQuantity))
+        viewModel.onEvent(AddEditWardrobeEvents.TypeChanged(newType))
+        viewModel.onEvent(AddEditWardrobeEvents.SaveClothe)
+        assertEquals("There should be one item in Leg", 1, viewModel.wardrobeFormState.value.clothesByType[ClotheType.LEG]?.clotheList?.size)
+        assertEquals("The clothe is not correct", newClothe, viewModel.wardrobeFormState.value.clothesByType[newType]?.clotheList?.get(0)?.clothe)
+        assertEquals("The quantity is not correct", newQuantity, viewModel.wardrobeFormState.value.clothesByType[newType]?.clotheList?.get(0)?.quantity)
+        assertEquals("The type is not correct", newType, viewModel.wardrobeFormState.value.clothesByType[newType]?.clotheList?.get(0)?.type)
     }
 
     @Test

@@ -4,6 +4,7 @@ import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
@@ -36,10 +37,6 @@ fun AddEditWardrobeScreen(
 ) {
     val scaffoldState = rememberScaffoldState()
     val wardrobeFormState = viewModel.wardrobeFormState.value
-    val currentClotheState = viewModel.currentClothe.value
-    val displayClotheForm = viewModel.displayClotheForm.value
-    val displayBackDialog = viewModel.displayBackDialog.value
-    val displayDeleteDialog = viewModel.displayDeleteDialog.value
 
     BackHandler {
         viewModel.onEvent(AddEditWardrobeEvents.NavigateBackPressed())
@@ -108,11 +105,6 @@ fun AddEditWardrobeScreen(
             ) {
                 item {
                     Column(modifier = Modifier.fillMaxWidth()) {
-                        ClotheDialog(
-                            showDialog = displayClotheForm,
-                            data = currentClotheState,
-                            onEvent = { viewModel.onEvent(it) })
-
                         /* USERNAME */
                         OutlinedTextField(
                             value = wardrobeFormState.username,
@@ -168,48 +160,29 @@ fun AddEditWardrobeScreen(
                 }
 
                 /* CLOTHES */
-                var previousClotheType: ClotheType? = null
-                var startIndex = 0
-                var endIndex: Int
-                items(wardrobeFormState.clotheList.size) { id ->
-                    if (id == 0) {
-                        previousClotheType = wardrobeFormState.clotheList[id].type
-                    }
-                    if (previousClotheType != wardrobeFormState.clotheList[id].type) {
-                        endIndex = id - 1
+                items(wardrobeFormState.clothesByType.keys.toList()) { key ->
+                    wardrobeFormState.clothesByType[key]?.let { clotheListState ->
                         ClotheTypeExpendable(
-                            type = stringResource(id = previousClotheType!!.resId),
-                            contentList = wardrobeFormState.clotheList,
-                            startIndex = startIndex,
-                            endIndex = endIndex,
-                            onContentClick = { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(it)) }
+                            isExpended = clotheListState.isExpanded,
+                            type = stringResource(id = key.resId),
+                            contentList = clotheListState.clotheList,
+                            onTypeClick = { viewModel.onEvent(AddEditWardrobeEvents.TypeClicked(key)) },
+                            onContentClick = { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(key, it)) }
                         )
-
-                        startIndex = id
-                        previousClotheType = wardrobeFormState.clotheList[id].type
-                    }
-
-                    if (id == wardrobeFormState.clotheList.size - 1) {
-                        endIndex = id
-                        ClotheTypeExpendable(
-                            type = stringResource(id = previousClotheType!!.resId),
-                            contentList = wardrobeFormState.clotheList,
-                            startIndex = startIndex,
-                            endIndex = endIndex,
-                            onContentClick = { viewModel.onEvent(AddEditWardrobeEvents.UpdateClothe(it)) }
-                        )
-
-                        startIndex = id
-                        previousClotheType = wardrobeFormState.clotheList[id].type
-                    }
+                    }                    
                 }
             }
         }
     }
 
+    ClotheDialog(
+        showDialog = wardrobeFormState.currentClothe.displayClotheForm,
+        data = wardrobeFormState.currentClothe,
+        onEvent = { viewModel.onEvent(it) })
+
     // Navigate back alert dialog
     ValidationDialog(
-        display = displayBackDialog,
+        display = wardrobeFormState.displayBackDialog,
         title = stringResource(R.string.back_alert_title),
         text = stringResource(R.string.back_alert_dialog_message),
         onPositiveSelection = {
@@ -230,7 +203,7 @@ fun AddEditWardrobeScreen(
 
     // Delete wardrobe alert dialog
     ValidationDialog(
-        display = displayDeleteDialog,
+        display = wardrobeFormState.displayDeleteDialog,
         title = stringResource(id = R.string.delete),
         text = stringResource(id = R.string.delete_alert_dialog_message),
         onPositiveSelection = {
@@ -324,13 +297,13 @@ private fun ClotheDialog(
                         horizontalArrangement = Arrangement.SpaceAround
                     ) {
                         Button(
-                            modifier = Modifier.fillMaxWidth(if (!data.update) 1f else 0.5f),
+                            modifier = Modifier.fillMaxWidth(if (data.originalType == null) 1f else 0.5f),
                             onClick = { onEvent(AddEditWardrobeEvents.SaveClothe) }
                         ) {
                             Text(text = stringResource(R.string.save))
                         }
 
-                        if (data.update) {
+                        if (data.originalType != null) {
                             Spacer(modifier = Modifier.width(6.dp))
                             Button(
                                 onClick = { onEvent(AddEditWardrobeEvents.DeleteClothe) },

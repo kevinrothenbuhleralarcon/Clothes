@@ -38,8 +38,6 @@ class AddEditWardrobeViewModel @Inject constructor(
     private val _wardrobeFormState = mutableStateOf(WardrobeFormState())
     val wardrobeFormState: State<WardrobeFormState> = _wardrobeFormState
 
-    //private var clotheList: MutableList<Clothe> = mutableListOf()
-
     private val _uiEvent = Channel<UIEvent>()
     val uiEvent = _uiEvent.receiveAsFlow()
 
@@ -100,7 +98,8 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.UpdateClothe -> {
-                val clothe = wardrobeFormState.value.clothesByType[event.type]?.clotheList?.get(event.id)
+                val clothe =
+                    wardrobeFormState.value.clothesByType[event.type]?.clotheList?.get(event.id)
                 clothe?.let {
                     _wardrobeFormState.value = wardrobeFormState.value.copy(
                         currentClothe = ClotheFormState(
@@ -108,14 +107,15 @@ class AddEditWardrobeViewModel @Inject constructor(
                             clothe = it.clothe,
                             quantity = it.quantity,
                             type = it.type,
-                            originalType = it.type
+                            originalType = it.type,
+                            originalListIndex = event.id,
+                            displayClotheForm = true
                         )
                     )
                 }
             }
 
             is AddEditWardrobeEvents.SaveClothe -> {
-
                 _wardrobeFormState.value = wardrobeFormState.value.copy(
                     currentClothe = wardrobeFormState.value.currentClothe.copy(
                         clotheError = null,
@@ -124,7 +124,8 @@ class AddEditWardrobeViewModel @Inject constructor(
                 )
 
                 val clotheResult = validateClothe(wardrobeFormState.value.currentClothe.clothe)
-                val quantityResult = validateQuantity(wardrobeFormState.value.currentClothe.quantity)
+                val quantityResult =
+                    validateQuantity(wardrobeFormState.value.currentClothe.quantity)
 
                 val hasError = listOf(
                     clotheResult,
@@ -142,39 +143,36 @@ class AddEditWardrobeViewModel @Inject constructor(
                 }
 
                 if (wardrobeFormState.value.currentClothe.originalType == null) {
-                    _wardrobeFormState.value = wardrobeFormState.value.copy(
-                        clotheList = wardrobeFormState.value.clotheList
-                            .plus(currentClothe.value)
-                            .sortedWith(compareBy<ClotheFormState> { it.type }.thenBy { it.clothe })
-                    )
+                    addClothe()
                 } else {
-                    _wardrobeFormState.value = wardrobeFormState.value.copy(
-                        clotheList = wardrobeFormState.value.clotheList.map {
-                            if (it.id == currentClothe.value.id)
-                                currentClothe.value.copy(update = false)
-                            else
-                                it
-                        }
-                    )
+                    updateClothe()
                 }
-                _displayClotheForm.value = false
                 hasUnsavedChanged = true
             }
 
             is AddEditWardrobeEvents.CancelClothe -> {
-                _displayClotheForm.value = false
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = ClotheFormState()
+                )
             }
 
             is AddEditWardrobeEvents.DeleteClothe -> {
-                val elementToRemove =
-                    wardrobeFormState.value.clotheList.find { it.id == currentClothe.value.id }
-                elementToRemove?.let {
-                    _wardrobeFormState.value = wardrobeFormState.value.copy(
-                        clotheList = wardrobeFormState.value.clotheList.minus(it)
-                    )
+                wardrobeFormState.value.apply {
+                    this.currentClothe.originalListIndex?.let { index ->
+                        _wardrobeFormState.value = this.copy(
+                            clothesByType = this.clothesByType.entries.associate {
+                                if (it.key == this.currentClothe.originalType) {
+                                    it.key to it.value.copy(
+                                        clotheList = it.value.clotheList.minus(it.value.clotheList[index])
+                                    )
+                                } else {
+                                    it.key to it.value
+                                }
+                            },
+                            currentClothe = ClotheFormState()
+                        )
+                    }
                 }
-
-                _displayClotheForm.value = false
                 hasUnsavedChanged = true
             }
 
@@ -183,7 +181,9 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.DeleteWardrobe -> {
-                _displayDeleteDialog.value = false
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    displayDeleteDialog = false
+                )
                 when (event.dialogSelection) {
                     is AlertDialogSelection.PositiveSelection -> {
                         deleteWardrobe()
@@ -192,29 +192,47 @@ class AddEditWardrobeViewModel @Inject constructor(
                     is AlertDialogSelection.NegativeSelection -> {}
 
                     else -> {
-                        _displayDeleteDialog.value = true
+                        _wardrobeFormState.value = wardrobeFormState.value.copy(
+                            displayDeleteDialog = true
+                        )
                     }
                 }
             }
 
             is AddEditWardrobeEvents.NavigateBackPressed -> {
-                _displayBackDialog.value = false
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    displayBackDialog = false
+                )
                 when (event.dialogSelection) {
                     is AlertDialogSelection.PositiveSelection -> {
                         sendUiEvent(UIEvent.PopBackStack)
                     }
 
-                    is AlertDialogSelection.NegativeSelection -> { /*Nothing*/ }
+                    is AlertDialogSelection.NegativeSelection -> { /*Nothing*/
+                    }
 
                     else -> {
                         if (hasUnsavedChanged) {
-                            _displayBackDialog.value = true
-                        }
-                        else {
+                            _wardrobeFormState.value = wardrobeFormState.value.copy(
+                                displayBackDialog = true
+                            )
+                        } else {
                             sendUiEvent(UIEvent.PopBackStack)
                         }
                     }
                 }
+            }
+
+            is AddEditWardrobeEvents.TypeClicked -> {
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    clothesByType = wardrobeFormState.value.clothesByType.entries.associate {
+                        if (it.key == event.type) {
+                            it.key to it.value.copy(isExpanded = !it.value.isExpanded)
+                        } else {
+                            it.key to it.value
+                        }
+                    }
+                )
             }
         }
     }
@@ -313,6 +331,96 @@ class AddEditWardrobeViewModel @Inject constructor(
             viewModelScope.launch(dispatcher.io) {
                 deleteWardrobeWithClothes(it)
                 sendUiEvent(UIEvent.PopBackStack)
+            }
+        }
+    }
+
+    private fun addClothe() {
+        wardrobeFormState.value.apply {
+            if (this.currentClothe.type in this.clothesByType) {
+                _wardrobeFormState.value = this.copy(
+                    clothesByType = this.clothesByType.entries.associate {
+                        if (it.key == this.currentClothe.type) {
+                            it.key to it.value.copy(
+                                clotheList = it.value.clotheList + Clothe(
+                                    clothe = this.currentClothe.clothe,
+                                    quantity = this.currentClothe.quantity ?: 0,
+                                    type = this.currentClothe.type
+                                )
+                            )
+                        } else {
+                            it.key to it.value
+                        }
+                    },
+                    currentClothe = ClotheFormState()
+                )
+            } else {
+                _wardrobeFormState.value = this.copy(
+                    clothesByType = this.clothesByType + (this.currentClothe.type to ClotheListState(
+                        clotheList = listOf(
+                            Clothe(
+                                id = this.currentClothe.id,
+                                clothe = this.currentClothe.clothe,
+                                quantity = this.currentClothe.quantity ?: 0,
+                                type = this.currentClothe.type
+                            )
+                        )
+                    )),
+                    currentClothe = ClotheFormState()
+                )
+            }
+        }
+    }
+
+    private fun updateClothe() {
+        wardrobeFormState.value.apply {
+            if (this.currentClothe.type == this.currentClothe.originalType) {
+                _wardrobeFormState.value = this.copy(
+                    clothesByType = clothesByType.entries.associate {
+                        if (it.key == this.currentClothe.type) {
+                            it.key to it.value.copy(
+                                clotheList = it.value.clotheList.mapIndexed { index, clothe ->
+                                    if (index == this.currentClothe.originalListIndex) {
+                                        Clothe(
+                                            id = this.currentClothe.id,
+                                            clothe = this.currentClothe.clothe,
+                                            quantity = this.currentClothe.quantity ?: 0,
+                                            type = this.currentClothe.type
+                                        )
+                                    } else {
+                                        clothe
+                                    }
+                                }
+                            )
+                        } else {
+                            it.key to it.value
+                        }
+                    },
+                    currentClothe = ClotheFormState()
+                )
+            } else {
+                this.currentClothe.originalListIndex?.let { index ->
+                    if (this.clothesByType[this.currentClothe.originalType]?.clotheList?.size != 1) {
+                        _wardrobeFormState.value = this.copy(
+                            clothesByType = this.clothesByType.entries.associate {
+                                if (it.key == this.currentClothe.originalType) {
+                                    it.key to it.value.copy(
+                                        clotheList = it.value.clotheList.minus(it.value.clotheList[index])
+                                    )
+                                } else {
+                                    it.key to it.value
+                                }
+                            }
+                        )
+                    } else {
+                        this.currentClothe.originalType?.let {
+                            _wardrobeFormState.value = this.copy(
+                                clothesByType = this.clothesByType.minus(it)
+                            )
+                        }
+                    }
+                }
+                addClothe()
             }
         }
     }

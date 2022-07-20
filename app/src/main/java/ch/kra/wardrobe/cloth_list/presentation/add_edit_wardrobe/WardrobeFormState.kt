@@ -27,6 +27,7 @@ data class ClotheFormState(
     val quantityError: UIText? = null,
     val type: ClotheType = ClotheType.UPPER_BODY,
     val originalType: ClotheType? = null,
+    val originalListIndex: Int? = null,
     val displayClotheForm: Boolean = false,
 )
 
