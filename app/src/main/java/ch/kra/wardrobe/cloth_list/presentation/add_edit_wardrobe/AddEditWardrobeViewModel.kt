@@ -157,24 +157,10 @@ class AddEditWardrobeViewModel @Inject constructor(
             }
 
             is AddEditWardrobeEvents.DeleteClothe -> {
-                /* TODO remove the key if the clothList is empty */
-
-                wardrobeFormState.value.apply {
-                    this.currentClothe.originalListIndex?.let { index ->
-                        _wardrobeFormState.value = this.copy(
-                            clothesByType = this.clothesByType.entries.associate {
-                                if (it.key == this.currentClothe.originalType) {
-                                    it.key to it.value.copy(
-                                        clotheList = it.value.clotheList.minus(it.value.clotheList[index])
-                                    )
-                                } else {
-                                    it.key to it.value
-                                }
-                            },
-                            currentClothe = ClotheFormState()
-                        )
-                    }
-                }
+                removeCurrentClothe()
+                _wardrobeFormState.value = wardrobeFormState.value.copy(
+                    currentClothe = ClotheFormState()
+                )
                 hasUnsavedChanged = true
             }
 
@@ -401,8 +387,21 @@ class AddEditWardrobeViewModel @Inject constructor(
                     currentClothe = ClotheFormState()
                 )
             } else {
-                this.currentClothe.originalListIndex?.let { index ->
-                    if (this.clothesByType[this.currentClothe.originalType]?.clotheList?.size != 1) {
+                removeCurrentClothe()
+                addClothe()
+            }
+        }
+    }
+
+    private fun removeCurrentClothe() {
+        wardrobeFormState.value.apply {
+            this.currentClothe.originalType?.let { type ->
+                if (this.clothesByType[type]?.clotheList?.size == 1) {
+                    _wardrobeFormState.value = this.copy(
+                        clothesByType = this.clothesByType.minus(type)
+                    )
+                } else {
+                    this.currentClothe.originalListIndex?.let { index ->
                         _wardrobeFormState.value = this.copy(
                             clothesByType = this.clothesByType.entries.associate {
                                 if (it.key == this.currentClothe.originalType) {
@@ -414,15 +413,8 @@ class AddEditWardrobeViewModel @Inject constructor(
                                 }
                             }
                         )
-                    } else {
-                        this.currentClothe.originalType?.let {
-                            _wardrobeFormState.value = this.copy(
-                                clothesByType = this.clothesByType.minus(it)
-                            )
-                        }
                     }
                 }
-                addClothe()
             }
         }
     }
